@@ -1,0 +1,39 @@
+swagger: '2.0'
+info:
+  description: This is a superduper awesome service
+  version: 0.0.1-alpha
+  title: New service
+  contact:
+    email: info@sysunite.com
+  license:
+    name: AGPL 3.0
+    url: 'https://opensource.org/licenses/AGPL-3.0'
+basePath: /
+schemes:
+  - http
+paths:
+  /:
+    get:
+      summary: Get application and version info
+      description: 'In string'
+      operationId: getApplicationInfo
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: succes
+          schema:
+            type: string
+  /swagger:
+    get:
+      summary: Swagger definition of the service
+      description: >-
+        Returns the swagger file for the service, which specifies all its
+        capabilities
+      operationId: getSwagger
+      produces:
+        - application/yaml
+      responses:
+        '200':
+          description: succes
+

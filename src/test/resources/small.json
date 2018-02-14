@@ -1,0 +1,41 @@
+[
+    {
+        "action": "create-relation",
+        "graph": "otl-2.1.1",
+        "id": "cjdmtg1fq0001uirbkfgf33t7",
+        "key": "rdf:type",
+        "replaceGraph": "otl-2.1.1",
+        "replaceId": null,
+        "sourceGraph": "otl-2.1.1",
+        "sourceId": "cjdmtg1fp0000uirbnpin5b4o",
+        "targetGraph": "coins-base",
+        "targetId": "owl:Restriction",
+        "timestamp": 1518597001286
+    },
+    {
+        "action": "create-relation",
+        "graph": "otl-2.1.1",
+        "id": "cjdmtg1fq0002uirb8bhwrjvh",
+        "key": "owl:onProperty",
+        "replaceGraph": "otl-2.1.1",
+        "replaceId": null,
+        "sourceGraph": "otl-2.1.1",
+        "sourceId": "cjdmtg1fp0000uirbnpin5b4o",
+        "targetGraph": "coins-base",
+        "targetId": "coins-base:objectValue",
+        "timestamp": 1518597001286
+    },
+    {
+        "action": "create-relation",
+        "graph": "otl-2.1.1",
+        "id": "cjdmtg1fq0003uirbfzc5z2v9",
+        "key": "owl:allValuesFrom",
+        "replaceGraph": "otl-2.1.1",
+        "replaceId": null,
+        "sourceGraph": "otl-2.1.1",
+        "sourceId": "cjdmtg1fp0000uirbnpin5b4o",
+        "targetGraph": "otl-2.1.1",
+        "targetId": "MD0295:OB00717",
+        "timestamp": 1518597001286
+    }
+]

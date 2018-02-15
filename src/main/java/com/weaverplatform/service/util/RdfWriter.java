@@ -1,6 +1,8 @@
 package com.weaverplatform.service.util;
 
 import com.weaverplatform.protocol.WriteOperationParser;
+import com.weaverplatform.protocol.model.CreateAttributeOperation;
+import com.weaverplatform.protocol.model.CreateRelationOperation;
 import com.weaverplatform.protocol.model.WriteOperation;
 import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import org.eclipse.rdf4j.model.Statement;
@@ -9,6 +11,7 @@ import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +20,7 @@ import java.util.Map;
  */
 public class RdfWriter {
 
-  private static final int CHUNK_SIZE = 5000;
+  private static final int CHUNK_SIZE = 500000000;
 
   public static void write(InputStream input, OutputStream output, Map<String, String> prefixMap, String mainContext, String defaultPrefix) throws IOException {
 
@@ -27,7 +30,6 @@ public class RdfWriter {
 
     // Writer
     RDFXMLBasePrettyWriter writer = new RDFXMLBasePrettyWriter(output);
-//    RDFXMLWriter writer = new RDFXMLWriter(output);
     writer.setBase(mainContext);
     writer.handleNamespace("", mainContext+"#");
     for(String prefix : prefixMap.keySet()) {
@@ -36,6 +38,10 @@ public class RdfWriter {
 
     // Start looping
     List<WriteOperation> operations = parser.parseNext(input, CHUNK_SIZE);
+    operations.sort(new Comparator<WriteOperation>() {
+      public int compare(WriteOperation o1, WriteOperation o2) {
+        return sortKey(o1).compareTo(sortKey(o2));
+      }});
     writer.startRDF();
     while(!operations.isEmpty()) {
 
@@ -77,5 +83,15 @@ public class RdfWriter {
       operations = parser.parseNext(input, CHUNK_SIZE);
     }
     writer.endRDF();
+  }
+
+  public static String sortKey(WriteOperation operation) {
+    if(operation instanceof CreateAttributeOperation) {
+      return ((CreateAttributeOperation) operation).getSourceId();
+    }
+    if(operation instanceof CreateRelationOperation) {
+      return ((CreateRelationOperation) operation).getSourceId();
+    }
+    return operation.getId();
   }
 }

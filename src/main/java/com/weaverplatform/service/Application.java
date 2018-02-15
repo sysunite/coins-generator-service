@@ -1,6 +1,7 @@
 package com.weaverplatform.service;
 
 import com.weaverplatform.service.controllers.ApplicationController;
+import com.weaverplatform.service.controllers.ContainerController;
 import com.weaverplatform.service.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,15 @@ public class Application {
 
     // Route registration and mapping
     get("/",                   ApplicationController.about);
-    //get("/swagger",            ApplicationController.connection);
+
+    post("/:zipKey/addRdf",            ContainerController.addRdf);
+    post("/:zipKey/addTtl",            ContainerController.addTtl);
+    post("/:zipKey/addFile",           ContainerController.addFile);
+
+    get("/:zipKey/download",           ContainerController.download);
+
+    get("/:zipKey/wipe",               ContainerController.wipe);
+
     get("/swagger", new Route() {
       @Override
       public Object handle(Request request, Response response) throws Exception {

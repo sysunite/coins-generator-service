@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  description: This is a superduper awesome service
+  description: Create a coins-container and download it.
   version: 0.0.1-alpha
-  title: New service
+  title: coins-generator-service
   contact:
     email: info@sysunite.com
   license:
@@ -33,6 +33,100 @@ paths:
       operationId: getSwagger
       produces:
         - application/yaml
+      responses:
+        '200':
+          description: succes
+
+  /{zipKey}/addRdf:
+    post:
+      description: >-
+        Create an rdf/xml file in the container
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                config: # Part 1 (a config json)
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    prefixMap:
+                      type: string
+                    defaultPrefix:
+                      type: string
+                    mainContext:
+                      type: string
+                payload: # Part 2 (a write-operations json)
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: succes
+
+  /{zipKey}/addTtl:
+    post:
+      description: >-
+        Create an turtle file in the container
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                config: # Part 1 (a config json)
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    prefixMap:
+                      type: string
+                    defaultPrefix:
+                      type: string
+                    mainContext:
+                      type: string
+                payload: # Part 2 (a write-operations json)
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: succes
+
+  /{zipKey}/addFile:
+    post:
+      description: >-
+        Store an binary file in the container
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                config: # Part 1 (a config json)
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                file: # Part 2 (a write-operations json)
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: succes
+
+  /{zipKey}/download:
+    get:
+      description: >-
+        Download the container file in its current status
+      produces:
+        - application/ccr
+      responses:
+        '200':
+          description: succes
+
+  /{zipKey}/wipe:
+    get:
       responses:
         '200':
           description: succes

@@ -1,11 +1,12 @@
 package com.weaverplatform.service;
 
+import com.weaverplatform.service.controllers.AddFileRequest;
+import com.weaverplatform.service.controllers.AddTriplesRequest;
 import com.weaverplatform.service.util.ZipWriter;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class ZipWriterTest {
@@ -54,7 +55,15 @@ public class ZipWriterTest {
     prefixMap.put("coins", "http://otl.rws.nl/coins#");
     prefixMap.put("rf", "http://otl.rws.nl/coins2/rws-referentiekader.rdf#");
     String mainContext = "http://dataroom";
-    ZipWriter.addRdfToZip(stream, zipKey, Paths.get("otl.rdf"), prefixMap, mainContext, "");
+
+    AddTriplesRequest config = new AddTriplesRequest();
+    config.setPayload(stream);
+    config.setDefaultPrefix("");
+    config.setMainContext(mainContext);
+    config.setPrefixMap(prefixMap);
+    config.setPath("otl.rdf");
+
+    ZipWriter.addRdfToZip(zipKey, config);
   }
 
   @Test
@@ -101,13 +110,26 @@ public class ZipWriterTest {
     prefixMap.put("coins", "http://otl.rws.nl/coins#");
     prefixMap.put("rf", "http://otl.rws.nl/coins2/rws-referentiekader.rdf#");
     String mainContext = "http://dataroom";
-    ZipWriter.addTtlToZip(stream, zipKey, Paths.get("bimdee/big.ttl"), prefixMap, mainContext, "");
+
+    AddTriplesRequest config = new AddTriplesRequest();
+    config.setPayload(stream);
+    config.setDefaultPrefix("");
+    config.setMainContext(mainContext);
+    config.setPrefixMap(prefixMap);
+    config.setPath("otl.rdf");
+
+    ZipWriter.addTtlToZip(zipKey, config);
   }
 
   @Test
   public void addFile() throws IOException {
     InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream("tree.jpg");
     String zipKey = "abc";
-    ZipWriter.addToZip(stream, zipKey, Paths.get("x/tree.jpg"));
+
+    AddFileRequest config = new AddFileRequest();
+    config.setFile(stream);
+    config.setPath("x/tree.jpg");
+
+    ZipWriter.addToZip(zipKey, config);
   }
 }

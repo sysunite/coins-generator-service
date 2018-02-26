@@ -38,47 +38,48 @@ public class CoinsMapper {
 
 
 
-  public Statement write(WriteOperation operation) {
+  public  Statement map(SuperOperation operation) {
 
-    switch (operation.getAction()) {
-
-      case CREATE_NODE :
-        return createIndividual((CreateNodeOperation)operation);
-
-      case CREATE_ATTRIBUTE :
-        if(((CreateAttributeOperation)operation).isReplacing()) {
-          throw new RuntimeException("Removes or replaces not allowed");
-        }
-        return createAttribute((CreateAttributeOperation)operation);
-
-      case CREATE_RELATION :
-        if(((CreateRelationOperation)operation).isReplacing()) {
-          throw new RuntimeException("Removes or replaces not allowed");
-        }
-        return createRelation((CreateRelationOperation)operation);
-
-      case REMOVE_NODE :
-      case REMOVE_ATTRIBUTE :
-      case REMOVE_RELATION :
-        throw new RuntimeException("Removes or replaces not allowed for Coins2-1 profile.");
-
-      default:
-        throw new RuntimeException("This operation is not supported: "+operation.getAction());
+    if("create-node".equals(operation.getAction())) {
+      return createIndividual(operation);
     }
+
+    if("create-attribute".equals(operation.getAction())) {
+      if (operation.isReplacing()) {
+        throw new RuntimeException("Removes or replaces not allowed");
+      }
+      return createAttribute(operation);
+    }
+
+    if("create-relation".equals(operation.getAction())) {
+      if (operation.isReplacing()) {
+        throw new RuntimeException("Removes or replaces not allowed");
+      }
+      return createRelation(operation);
+    }
+
+    if("create-relation".equals(operation.getAction()) ||
+      "create-relation".equals(operation.getAction()) ||
+      "create-relation".equals(operation.getAction()) ||
+      "create-relation".equals(operation.getAction())) {
+        throw new RuntimeException("Removes or replaces not allowed for Coins2-1 profile.");
+    }
+
+    throw new RuntimeException("This operation is not supported: "+operation.getAction());
   }
 
-  private Statement createIndividual(CreateNodeOperation payload) {
+  private Statement createIndividual(SuperOperation payload) {
     return null;
   }
 
-  private Statement createAttribute(CreateAttributeOperation payload) {
+  private Statement createAttribute(SuperOperation payload) {
     IRI subject = getIRI(payload.getSourceId());
     IRI predicate = getIRI(payload.getKey());
     Value object = createValue(payload.getValue(), payload.getDatatype());
     return valueFactory.createStatement(subject, predicate, object, context);
   }
 
-  private Statement createRelation(CreateRelationOperation payload) {
+  private Statement createRelation(SuperOperation payload) {
     IRI subject = getIRI(payload.getSourceId());
     IRI predicate = getIRI(payload.getKey());
     IRI object = getIRI(payload.getTargetId());

@@ -8,7 +8,6 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
@@ -19,7 +18,7 @@ import java.util.HashMap;
 public class AddTriplesRequest {
 
   @Expose(serialize = false)
-  private InputStream payload;
+  private Part payload;
 
   @Expose
   private HashMap<String, String> prefixMap;
@@ -34,11 +33,11 @@ public class AddTriplesRequest {
   private String path;
 
 
-  public void setPayload(InputStream payload) {
+  public void setPayload(Part payload) {
     this.payload = payload;
   }
 
-  public InputStream getPayload() {
+  public Part getPayload() {
     return payload;
   }
 
@@ -82,7 +81,7 @@ public class AddTriplesRequest {
 
     Reader reader = new InputStreamReader(config.getInputStream(), "UTF-8");
     AddTriplesRequest result  = new Gson().fromJson(reader, AddTriplesRequest.class);
-    result.setPayload(payload.getInputStream());
+    result.setPayload(payload);
     return result;
   }
 }

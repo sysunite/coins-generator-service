@@ -36,12 +36,12 @@ public class ZipWriter {
     freeZipKey(zipKey);
   }
 
-  public static void addRdfToZip(String zipKey, AddTriplesRequest config) throws IOException {
+  public static void addXmlToZip(String zipKey, AddTriplesRequest config) throws IOException {
 
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.write(config.getPayload(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
+        RdfWriter.writeXml(config.getPayload(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
       }
     }
     freeZipKey(zipKey);

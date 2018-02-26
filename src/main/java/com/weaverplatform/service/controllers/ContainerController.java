@@ -14,7 +14,7 @@ public class ContainerController {
   public static Route addRdf = (Request request, Response response) -> {
     String zipKey = request.params("zipKey");
     AddTriplesRequest config = AddTriplesRequest.from(request);
-    ZipWriter.addRdfToZip(zipKey, config);
+    ZipWriter.addXmlToZip(zipKey, config);
     return null;
   };
 

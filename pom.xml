@@ -28,7 +28,7 @@
     <dependency>
       <groupId>com.weaverplatform</groupId>
       <artifactId>sdk-java</artifactId>
-      <version>3.2.2</version>
+      <version>3.2.3-SNAPSHOT</version>
     </dependency>
     <!-- Spark Webserver -->
     <dependency>

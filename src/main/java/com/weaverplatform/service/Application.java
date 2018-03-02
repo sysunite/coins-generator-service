@@ -2,6 +2,8 @@ package com.weaverplatform.service;
 
 import com.weaverplatform.service.controllers.ApplicationController;
 import com.weaverplatform.service.controllers.ContainerController;
+import com.weaverplatform.service.controllers.RdfController;
+import com.weaverplatform.service.controllers.StoreController;
 import com.weaverplatform.service.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +43,17 @@ public class Application {
     // Route registration and mapping
     get("/",                   ApplicationController.about);
 
-    post("/:zipKey/addRdf",            ContainerController.addRdf);
-    post("/:zipKey/addTtl",            ContainerController.addTtl);
-    post("/:zipKey/addFile",           ContainerController.addFile);
+    get("/containerToStore",   StoreController.containerToStore);
+    get("/fileFromStore",      StoreController.fileFromStore);
 
-    get("/:zipKey/download",           ContainerController.download);
+    post("/addRdf",            RdfController.addXml);
+    post("/addTtl",            RdfController.addTtl);
+    post("/addFile",           ContainerController.addFile);
 
-    get("/:zipKey/wipe",               ContainerController.wipe);
+    get("/download",           ContainerController.download);
+
+    get("/resetLocks",         ContainerController.resetLocks);
+    get("/wipe",               ContainerController.wipe);
 
     get("/swagger", new Route() {
       @Override

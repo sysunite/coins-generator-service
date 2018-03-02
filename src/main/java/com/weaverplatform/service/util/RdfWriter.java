@@ -37,7 +37,7 @@ public class RdfWriter {
 
     for(Character filterChar : filterChars) {
 
-      System.out.println(filterChar);
+
       SortedWriteOperationParser parser = new SortedWriteOperationParser();
 
       try(InputStream inputStream = input.getInputStream()) {
@@ -49,7 +49,7 @@ public class RdfWriter {
         while (!operations.isEmpty()) {
 
           if(operations.size() >= CHUNK_SIZE) {
-            System.out.println("Please try to increase chunk size, not able to sort like this");
+            throw new RuntimeException("Please try to increase chunk size, not able to sort like this");
           }
 
           for(SuperOperation operation : operations) {

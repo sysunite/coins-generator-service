@@ -1,4 +1,4 @@
-package com.weaverplatform.service.controllers;
+package com.weaverplatform.service.payloads;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
@@ -15,7 +15,7 @@ import java.io.Reader;
 /**
  * @author bastbijl, Sysunite 2018
  */
-public class AddFileRequest {
+public class FileFromMultipartRequest implements AddFileRequest {
 
   @Expose(serialize = false)
   private InputStream file;
@@ -40,14 +40,14 @@ public class AddFileRequest {
     return path;
   }
 
-  public static AddFileRequest from(Request request) throws IOException, ServletException {
+  public static FileFromMultipartRequest from(Request request) throws IOException, ServletException {
     MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp/multipart");
-    request.raw().setAttribute("org.eclipse.multipartConfig", multipartConfigElement);
+    request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
     Part file = request.raw().getPart("file");
     Part config = request.raw().getPart("config");
 
     Reader reader = new InputStreamReader(config.getInputStream(), "UTF-8");
-    AddFileRequest result  = new Gson().fromJson(reader, AddFileRequest.class);
+    FileFromMultipartRequest result  = new Gson().fromJson(reader, FileFromMultipartRequest.class);
     result.setFile(file.getInputStream());
     return result;
   }

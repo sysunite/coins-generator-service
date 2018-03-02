@@ -1,11 +1,10 @@
 package com.weaverplatform.service.util;
 
-import com.weaverplatform.service.controllers.AddFileRequest;
-import com.weaverplatform.service.controllers.AddTriplesRequest;
+import com.weaverplatform.sdk.Weaver;
+import com.weaverplatform.service.payloads.AddFileRequest;
+import com.weaverplatform.service.payloads.AddTriplesRequest;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.HashMap;
@@ -21,6 +20,10 @@ public class ZipWriter {
   private static final int BLOCK_RETRIES = 10;
 
   private static HashSet<String> blockList = new HashSet<>();
+
+  public static void resetBlockList() {
+    blockList = new HashSet<>();
+  }
 
   public static void addToZip(String zipKey, AddFileRequest config) throws IOException {
 
@@ -58,7 +61,7 @@ public class ZipWriter {
     freeZipKey(zipKey);
   }
 
-  private static File requestAccess(String zipKey) {
+  private static synchronized File requestAccess(String zipKey) {
     int retries = 0;
     while(blockList.contains(zipKey) && retries++ < BLOCK_RETRIES) {
       try {
@@ -98,6 +101,14 @@ public class ZipWriter {
     Files.copy(file.toPath(), stream);
     stream.flush();
     freeZipKey(zipKey);
+  }
+
+  public static com.weaverplatform.sdk.File streamDownload(String zipKey, Weaver weaver) throws IOException {
+    File file = requestAccess(zipKey);
+    FileInputStream input = new FileInputStream(file);
+    com.weaverplatform.sdk.File weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
+    freeZipKey(zipKey);
+    return weaverFile;
   }
 
   public static void wipe(String zipKey) {

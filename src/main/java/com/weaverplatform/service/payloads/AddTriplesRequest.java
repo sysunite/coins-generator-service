@@ -1,4 +1,4 @@
-package com.weaverplatform.service.controllers;
+package com.weaverplatform.service.payloads;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
@@ -75,7 +75,7 @@ public class AddTriplesRequest {
 
   public static AddTriplesRequest from(Request request) throws IOException, ServletException {
     MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp/multipart");
-    request.raw().setAttribute("org.eclipse.multipartConfig", multipartConfigElement);
+    request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
     Part payload = request.raw().getPart("payload");
     Part config = request.raw().getPart("config");
 

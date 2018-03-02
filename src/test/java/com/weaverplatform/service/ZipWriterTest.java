@@ -1,7 +1,8 @@
 package com.weaverplatform.service;
 
-import com.weaverplatform.service.controllers.AddFileRequest;
-import com.weaverplatform.service.controllers.AddTriplesRequest;
+import com.weaverplatform.service.payloads.AddFileRequest;
+import com.weaverplatform.service.payloads.AddTriplesRequest;
+import com.weaverplatform.service.payloads.FileFromMultipartRequest;
 import com.weaverplatform.service.util.ZipWriter;
 import org.junit.Test;
 
@@ -126,13 +127,10 @@ public class ZipWriterTest {
   }
 
   @Test
-  public void addFile() throws IOException {
-    InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream("tree.jpg");
-    String zipKey = "abc";
   public void addFile(String zipKey, String resourcePath, String zipPath) throws IOException {
     InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream(resourcePath);
 
-    AddFileRequest config = new AddFileRequest();
+    AddFileRequest config = new FileFromMultipartRequest();
     config.setFile(stream);
     config.setPath(zipPath);
 

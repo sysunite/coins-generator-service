@@ -16,7 +16,7 @@ public class StoreController {
   public static final String USER = Props.get("SERVICE_USER","service.user");
   public static final String PASSWORD = Props.get("SERVICE_PASSWORD", "service.password");
 
-  private static Weaver getWeaver(String project) {
+  public static Weaver getWeaver(String project) {
     Weaver instance = new Weaver();
     instance.setUri(WEAVER_URI);
     instance.setUsername(USER);

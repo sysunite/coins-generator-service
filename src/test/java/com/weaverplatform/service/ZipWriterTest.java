@@ -56,7 +56,7 @@ public class ZipWriterTest {
     String mainContext = "http://dataroom"; // main context please without hash
 
     AddTriplesRequest config = new AddTriplesRequest();
-    config.setPayload(new PartMock("big.json"));
+    config.addPayload(new PartMock("big.json"));
     config.setDefaultPrefix("");
     config.setMainContext(mainContext);
     config.setPrefixMap(prefixMap);
@@ -111,7 +111,7 @@ public class ZipWriterTest {
     String mainContext = "http://areaal.rws.nl"; // main context please without hash
 
     AddTriplesRequest config = new AddTriplesRequest();
-    config.setPayload(new PartMock("dataroom-zuidoost/dataroom-zuidoost-data.json"));
+    config.addPayload(new PartMock("dataroom-zuidoost/dataroom-zuidoost-data.json"));
 //    config.setPayload(new PartMock("dataroom-zuidoost/dataroom-zuidoost-testdata.json"));
 //    config.setPayload(new PartMock("dataroom-zuidoost/one.json"));
     config.setDefaultPrefix("");

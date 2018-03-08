@@ -1,6 +1,7 @@
 package com.weaverplatform.service.util;
 
 import com.weaverplatform.sdk.Weaver;
+import com.weaverplatform.sdk.WeaverFile;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
 
@@ -44,7 +45,7 @@ public class ZipWriter {
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeXml(config.getPayload(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
+        RdfWriter.writeXml(config.getPayloads(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
       }
     }
     freeZipKey(zipKey);
@@ -55,7 +56,7 @@ public class ZipWriter {
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeTtl(config.getPayload(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
+        RdfWriter.writeTtl(config.getPayloads(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
       }
     }
     freeZipKey(zipKey);
@@ -103,10 +104,10 @@ public class ZipWriter {
     freeZipKey(zipKey);
   }
 
-  public static com.weaverplatform.sdk.File streamDownload(String zipKey, Weaver weaver) throws IOException {
+  public static WeaverFile streamDownload(String zipKey, Weaver weaver) throws IOException {
     File file = requestAccess(zipKey);
     FileInputStream input = new FileInputStream(file);
-    com.weaverplatform.sdk.File weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
+    WeaverFile weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
     freeZipKey(zipKey);
     return weaverFile;
   }
@@ -118,7 +119,17 @@ public class ZipWriter {
   }
 
   private static void freeZipKey(String zipKey) {
+    if(blockList.contains(zipKey)) {
+      System.out.println(blockList.size() + " contains " + zipKey);
+    } else {
+      System.out.println(blockList.size() + " does not containe " + zipKey);
+    }
     blockList.remove(zipKey);
+    if(blockList.contains(zipKey)) {
+      System.out.println(blockList.size() + " contains " + zipKey);
+    } else {
+      System.out.println(blockList.size() + " does not containe " + zipKey);
+    }
   }
 
 }

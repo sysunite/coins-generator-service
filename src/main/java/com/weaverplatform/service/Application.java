@@ -1,9 +1,6 @@
 package com.weaverplatform.service;
 
-import com.weaverplatform.service.controllers.ApplicationController;
-import com.weaverplatform.service.controllers.ContainerController;
-import com.weaverplatform.service.controllers.RdfController;
-import com.weaverplatform.service.controllers.StoreController;
+import com.weaverplatform.service.controllers.*;
 import com.weaverplatform.service.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,19 +38,22 @@ public class Application {
     threadPool(100, 5, 30000);
 
     // Route registration and mapping
-    get("/",                   ApplicationController.about);
+    get("/",                    ApplicationController.about);
 
-    get("/containerToStore",   StoreController.containerToStore);
-    get("/fileFromStore",      StoreController.fileFromStore);
+    get("/containerToStore",    StoreController.containerToStore);
+    get("/fileFromStore",       StoreController.fileFromStore);
 
-    post("/addRdf",            RdfController.addXml);
-    post("/addTtl",            RdfController.addTtl);
-    post("/addFile",           ContainerController.addFile);
+    post("/addFile",            ContainerController.addFile);
+    post("/addRdf",             RdfController.addXml);
+    post("/addTtl",             RdfController.addTtl);
 
-    get("/download",           ContainerController.download);
+    post("/addRdfFromSnapshot", SnapshotRdfController.addXml);
+    post("/addTtlFromSnapshot", SnapshotRdfController.addTtl);
 
-    get("/resetLocks",         ContainerController.resetLocks);
-    get("/wipe",               ContainerController.wipe);
+    get("/download",            ContainerController.download);
+
+    get("/resetLocks",          ContainerController.resetLocks);
+    get("/wipe",                ContainerController.wipe);
 
     get("/swagger", new Route() {
       @Override

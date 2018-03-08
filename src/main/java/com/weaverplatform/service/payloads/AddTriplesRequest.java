@@ -10,7 +10,9 @@ import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author bastbijl, Sysunite 2018
@@ -18,7 +20,7 @@ import java.util.HashMap;
 public class AddTriplesRequest {
 
   @Expose(serialize = false)
-  private Part payload;
+  private List<Part> payloads = null;
 
   @Expose
   private HashMap<String, String> prefixMap;
@@ -33,12 +35,15 @@ public class AddTriplesRequest {
   private String path;
 
 
-  public void setPayload(Part payload) {
-    this.payload = payload;
+  public void addPayload(Part payload) {
+    if(this.payloads == null) {
+      this.payloads = new ArrayList<>();
+    }
+    this.payloads.add(payload);
   }
 
-  public Part getPayload() {
-    return payload;
+  public List<Part> getPayloads() {
+    return payloads;
   }
 
   public void setPrefixMap(HashMap<String, String> prefixMap) {
@@ -73,7 +78,7 @@ public class AddTriplesRequest {
     return path;
   }
 
-  public static AddTriplesRequest from(Request request) throws IOException, ServletException {
+  public static AddTriplesRequest fromMultipart(Request request) throws IOException, ServletException {
     MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp/multipart");
     request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
     Part payload = request.raw().getPart("payload");
@@ -81,7 +86,26 @@ public class AddTriplesRequest {
 
     Reader reader = new InputStreamReader(config.getInputStream(), "UTF-8");
     AddTriplesRequest result  = new Gson().fromJson(reader, AddTriplesRequest.class);
-    result.setPayload(payload);
+    result.addPayload(payload);
     return result;
+  }
+
+  public static AddTriplesRequest fromBody(Request request) throws IOException, ServletException {
+    AddTriplesRequest result  = new Gson().fromJson(request.body(), AddTriplesRequest.class);
+    System.out.println(request.body());
+    return result;
+  }
+
+  public void cleanUp() {
+    if(this.payloads == null) {
+      return;
+    }
+    for(Part part : payloads) {
+      try {
+        part.delete();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

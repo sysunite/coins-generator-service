@@ -22,7 +22,7 @@ public class RdfController {
 
     AddTriplesRequest config;
     try {
-      config = AddTriplesRequest.from(request);
+      config = AddTriplesRequest.fromMultipart(request);
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
@@ -58,7 +58,7 @@ public class RdfController {
 
     AddTriplesRequest config;
     try {
-      config = AddTriplesRequest.from(request);
+      config = AddTriplesRequest.fromMultipart(request);
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");

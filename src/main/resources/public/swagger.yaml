@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  description: This is a superduper awesome service
-  version: 0.0.1-alpha
-  title: New service
+  description: Create a coins-container and download it.
+  version: 0.1.0
+  title: coins-generator-service
   contact:
     email: info@sysunite.com
   license:
@@ -15,7 +15,7 @@ paths:
   /:
     get:
       summary: Get application and version info
-      description: 'In string'
+      description: In string
       operationId: getApplicationInfo
       produces:
         - application/json
@@ -33,6 +33,237 @@ paths:
       operationId: getSwagger
       produces:
         - application/yaml
+      responses:
+        '200':
+          description: succes
+
+  /addRdf:
+    post:
+      description: >-
+        Create an rdf/xml file in the container
+      operationId: addRdf
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: formData
+          name: config
+          type: string
+          description: config json (fields are path, prefixMap, defaultPrefix, mainContext)
+        - in: formData
+          name: payload
+          type: file
+          description: write operations json file
+      responses:
+        '200':
+          description: succes
+
+  /addTtl:
+    post:
+      description: >-
+        Create an turtle file in the container
+      operationId: addTtl
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: formData
+          name: config
+          type: string
+          description: config json (fields are path, prefixMap, defaultPrefix, mainContext)
+        - in: formData
+          name: payload
+          type: file
+          description: write operations json file
+      responses:
+        '200':
+          description: succes
+
+  /addRdfFromSnapshot:
+    post:
+      description: >-
+        Create an rdf/xml file in the container
+      operationId: addRdfFromSnapshot
+      parameters:
+        - in: query
+          name: project
+          required: true
+          type: string
+          description: the id of the project
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: query
+          name: graphs
+          required: true
+          type: array
+          items:
+            type: string
+          description: the graphs to pull from the connector (null for default graph)
+        - in: body
+          name: config
+          required: true
+          schema:
+            type: string
+          description: config json (fields are path, prefixMap, defaultPrefix, mainContext)
+      responses:
+        '200':
+          description: succes
+
+  /addTtlFromSnapshot:
+    post:
+      description: >-
+        Create an turtle file in the container
+      operationId: addTtlFromSnapshot
+      parameters:
+        - in: query
+          name: project
+          required: true
+          type: string
+          description: the id of the project
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: query
+          name: graphs
+          required: true
+          type: array
+          items:
+            type: string
+          description: the graphs to pull from the connector (null for default graph)
+        - in: body
+          name: config
+          required: true
+          schema:
+            type: string
+          description: config json (fields are path, prefixMap, defaultPrefix, mainContext)
+      responses:
+        '200':
+          description: succes
+
+  /addFile:
+    post:
+      description: >-
+        Store an binary file in the container
+      operationId: addFile
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: formData
+          name: config
+          type: string
+          description: config json (path:_)
+        - in: formData
+          name: file
+          type: file
+          description: the file to upload
+      responses:
+        '200':
+          description: succes
+
+  /download:
+    get:
+      description: >-
+        Download the container file in its current status
+      operationId: downloadContainer
+      parameters:
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+      produces:
+        - application/octet-stream
+      responses:
+        '200':
+          description: succes
+
+  /containerToStore:
+    get:
+      description: >-
+        Send the container file in its current status to the store
+      operationId: containerToStore
+      parameters:
+        - in: query
+          name: project
+          required: true
+          type: string
+          description: the id of the project
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+      responses:
+        '200':
+          description: succes
+
+  /fileFromStore:
+    get:
+      description: >-
+        Put a file from the store in the container
+      operationId: fileFromStore
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: project
+          required: true
+          type: string
+          description: the id of the project
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: query
+          name: path
+          required: true
+          type: string
+          description: the file path in the container where to send the file to
+        - in: query
+          name: fileId
+          required: true
+          type: string
+          description: the id of the file in the store
+      responses:
+        '200':
+          description: succes
+
+  /resetLocks:
+    get:
+      operationId: resetLocks
+      responses:
+        '200':
+          description: succes
+
+
+  /wipe:
+    get:
+      operationId: wipe
+      parameters:
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
       responses:
         '200':
           description: succes

@@ -1,21 +1,21 @@
 package com.weaverplatform.service;
 
+import com.weaverplatform.service.payloads.AddFileRequest;
+import com.weaverplatform.service.payloads.AddTriplesRequest;
+import com.weaverplatform.service.payloads.FileFromMultipartRequest;
 import com.weaverplatform.service.util.ZipWriter;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class ZipWriterTest {
 
   @Test
   public void addRdf() throws IOException {
-    InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream("big.json");
     String zipKey = "abc";
     HashMap<String, String> prefixMap = new HashMap<>();
-    prefixMap.put("", "http://ins#");
     prefixMap.put("actuele-wegenlijst", "http://otl.rws.nl/actuele-wegenlijst#");
     prefixMap.put("coins-base", "http://www.coinsweb.nl/cbim-2.0.rdf#");
     prefixMap.put("cbim", "http://www.coinsweb.nl/cbim-2.0.rdf#");
@@ -53,16 +53,24 @@ public class ZipWriterTest {
     prefixMap.put("xsd", "http://www.w3.org/2001/XMLSchema#");
     prefixMap.put("coins", "http://otl.rws.nl/coins#");
     prefixMap.put("rf", "http://otl.rws.nl/coins2/rws-referentiekader.rdf#");
-    String mainContext = "http://dataroom";
-    ZipWriter.addRdfToZip(stream, zipKey, Paths.get("otl.rdf"), prefixMap, mainContext, "");
+    String mainContext = "http://dataroom"; // main context please without hash
+
+    AddTriplesRequest config = new AddTriplesRequest();
+    config.addPayload(new PartMock("big.json"));
+    config.setDefaultPrefix("");
+    config.setMainContext(mainContext);
+    config.setPrefixMap(prefixMap);
+    config.setPath("otl.rdf");
+
+    ZipWriter.addXmlToZip(zipKey, config);
   }
 
   @Test
-  public void addTtl() throws IOException {
-    InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream("big.json");
+  public void addTtl() {
     String zipKey = "abc";
     HashMap<String, String> prefixMap = new HashMap<>();
-    prefixMap.put("", "http://ins#");
+
+    prefixMap.put("areaal", "http://areaal.rws.nl#");
     prefixMap.put("actuele-wegenlijst", "http://otl.rws.nl/actuele-wegenlijst#");
     prefixMap.put("coins-base", "http://www.coinsweb.nl/cbim-2.0.rdf#");
     prefixMap.put("cbim", "http://www.coinsweb.nl/cbim-2.0.rdf#");
@@ -100,14 +108,32 @@ public class ZipWriterTest {
     prefixMap.put("xsd", "http://www.w3.org/2001/XMLSchema#");
     prefixMap.put("coins", "http://otl.rws.nl/coins#");
     prefixMap.put("rf", "http://otl.rws.nl/coins2/rws-referentiekader.rdf#");
-    String mainContext = "http://dataroom";
-    ZipWriter.addTtlToZip(stream, zipKey, Paths.get("bimdee/big.ttl"), prefixMap, mainContext, "");
+    String mainContext = "http://areaal.rws.nl"; // main context please without hash
+
+    AddTriplesRequest config = new AddTriplesRequest();
+    config.addPayload(new PartMock("dataroom-zuidoost/dataroom-zuidoost-data.json"));
+//    config.setPayload(new PartMock("dataroom-zuidoost/dataroom-zuidoost-testdata.json"));
+//    config.setPayload(new PartMock("dataroom-zuidoost/one.json"));
+    config.setDefaultPrefix("");
+    config.setMainContext(mainContext);
+    config.setPrefixMap(prefixMap);
+    config.setPath("bim/content.ttl");
+
+    try {
+      ZipWriter.addTtlToZip(zipKey, config);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test
-  public void addFile() throws IOException {
-    InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream("tree.jpg");
-    String zipKey = "abc";
-    ZipWriter.addToZip(stream, zipKey, Paths.get("x/tree.jpg"));
+  public void addSomeFile(String zipKey, String resourcePath, String zipPath) throws IOException {
+    InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream(resourcePath);
+
+    AddFileRequest config = new FileFromMultipartRequest();
+    config.setFile(stream);
+    config.setPath(zipPath);
+
+    ZipWriter.addToZip(zipKey, config);
   }
 }

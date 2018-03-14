@@ -1,6 +1,6 @@
 package com.weaverplatform.service;
 
-import com.weaverplatform.service.controllers.ApplicationController;
+import com.weaverplatform.service.controllers.*;
 import com.weaverplatform.service.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +38,23 @@ public class Application {
     threadPool(100, 5, 30000);
 
     // Route registration and mapping
-    get("/",                   ApplicationController.about);
-    //get("/swagger",            ApplicationController.connection);
+    get("/",                    ApplicationController.about);
+
+    get("/containerToStore",    StoreController.containerToStore);
+    get("/fileFromStore",       StoreController.fileFromStore);
+
+    post("/addFile",            ContainerController.addFile);
+    post("/addRdf",             RdfController.addXml);
+    post("/addTtl",             RdfController.addTtl);
+
+    post("/addRdfFromSnapshot", SnapshotRdfController.addXml);
+    post("/addTtlFromSnapshot", SnapshotRdfController.addTtl);
+
+    get("/download",            ContainerController.download);
+
+    get("/resetLocks",          ContainerController.resetLocks);
+    get("/wipe",                ContainerController.wipe);
+
     get("/swagger", new Route() {
       @Override
       public Object handle(Request request, Response response) throws Exception {

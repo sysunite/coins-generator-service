@@ -49,7 +49,7 @@ public class DownloadedPart implements Part {
   }
 
   public void writeZippedStream(InputStream zippedStream) throws IOException {
-    FileOutputStream outputStream     = new FileOutputStream(temp);
+    FileOutputStream outputStream = new FileOutputStream(temp);
     IOUtils.copy(zippedStream, outputStream);
     zippedStream.close();
     outputStream.close();

@@ -14,6 +14,7 @@ public class PartMock implements Part {
   public PartMock(String fileName) {
     this.fileName = fileName;
   }
+
   @Override
   public InputStream getInputStream() throws IOException {
     return getClass().getClassLoader().getResourceAsStream(this.fileName);

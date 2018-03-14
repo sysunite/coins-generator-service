@@ -127,7 +127,7 @@ public class ZipWriterTest {
   }
 
   @Test
-  public void addFile(String zipKey, String resourcePath, String zipPath) throws IOException {
+  public void addSomeFile(String zipKey, String resourcePath, String zipPath) throws IOException {
     InputStream stream = ZipWriterTest.class.getClassLoader().getResourceAsStream(resourcePath);
 
     AddFileRequest config = new FileFromMultipartRequest();

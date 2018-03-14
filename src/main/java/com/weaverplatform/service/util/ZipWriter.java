@@ -119,17 +119,7 @@ public class ZipWriter {
   }
 
   private static void freeZipKey(String zipKey) {
-    if(blockList.contains(zipKey)) {
-      System.out.println(blockList.size() + " contains " + zipKey);
-    } else {
-      System.out.println(blockList.size() + " does not containe " + zipKey);
-    }
     blockList.remove(zipKey);
-    if(blockList.contains(zipKey)) {
-      System.out.println(blockList.size() + " contains " + zipKey);
-    } else {
-      System.out.println(blockList.size() + " does not containe " + zipKey);
-    }
   }
 
 }

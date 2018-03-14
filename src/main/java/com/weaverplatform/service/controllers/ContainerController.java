@@ -1,8 +1,10 @@
 package com.weaverplatform.service.controllers;
 
 
+import com.google.gson.Gson;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.FileFromMultipartRequest;
+import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
 import spark.Response;
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ContainerController {
+
+  public static Gson gson = new Gson();
 
   public static Route resetLocks = (Request request, Response response) -> {
     ZipWriter.resetBlockList();
@@ -27,7 +31,7 @@ public class ContainerController {
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     AddFileRequest config;
@@ -36,7 +40,7 @@ public class ContainerController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Problem parsing config json in multi-part\"}";
+      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
     }
 
     try {
@@ -45,11 +49,11 @@ public class ContainerController {
     } catch(IOException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Could not write file to "+zipKey+"\"}";
+      return gson.toJson(new Success(false, "Could not write file to "+zipKey+""));
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"" + e.getMessage() + "\"}";
+      return gson.toJson(new Success(false, "" + e.getMessage() + ""));
     }
 
     response.status(200);
@@ -63,7 +67,7 @@ public class ContainerController {
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     // Read the resulting file
@@ -73,7 +77,7 @@ public class ContainerController {
     } catch(Exception e) {
       response.status(500);
       response.body();
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     response.raw().setContentType("application/octet-stream");
@@ -87,7 +91,7 @@ public class ContainerController {
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     try {
@@ -95,7 +99,7 @@ public class ContainerController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     response.status(200);

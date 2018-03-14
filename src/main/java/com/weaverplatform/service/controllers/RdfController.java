@@ -1,7 +1,9 @@
 package com.weaverplatform.service.controllers;
 
 
+import com.google.gson.Gson;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
+import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
 import spark.Response;
@@ -11,13 +13,15 @@ import java.io.IOException;
 
 public class RdfController {
 
+  public static Gson gson = new Gson();
+
   public static Route addXml = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     AddTriplesRequest config;
@@ -26,7 +30,7 @@ public class RdfController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Problem parsing config json in multi-part\"}";
+      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
     }
 
     try {
@@ -35,11 +39,11 @@ public class RdfController {
     } catch(IOException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Could not write the write-ops to the container\"}";
+      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     response.status(200);
@@ -53,7 +57,7 @@ public class RdfController {
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     AddTriplesRequest config;
@@ -62,7 +66,7 @@ public class RdfController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Problem parsing config json in multi-part\"}";
+      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
     }
 
     try {
@@ -71,11 +75,11 @@ public class RdfController {
     } catch(IOException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Could not write the write-ops to the container\"}";
+      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     response.status(200);

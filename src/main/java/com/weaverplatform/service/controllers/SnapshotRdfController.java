@@ -1,8 +1,10 @@
 package com.weaverplatform.service.controllers;
 
 
+import com.google.gson.Gson;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
+import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.DownloadedPart;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
@@ -18,20 +20,22 @@ import static com.weaverplatform.service.controllers.StoreController.getWeaver;
 
 public class SnapshotRdfController {
 
+  public static Gson gson = new Gson();
+
   public static Route addXml = (Request request, Response response) -> {
 
     String project = request.queryParamOrDefault("project", null);
     if(project == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide project\"}";
+      return gson.toJson(new Success(false, "Please provide project"));
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     List<String> graphs = new ArrayList<>();
@@ -45,7 +49,7 @@ public class SnapshotRdfController {
     if(graphs == null || graphs.size() < 1) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide at lease one graph name\"}";
+      return gson.toJson(new Success(false, "Please provide at lease one graph name"));
     }
 
     Weaver weaver;
@@ -54,7 +58,7 @@ public class SnapshotRdfController {
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"\"}";
+      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
     }
 
     AddTriplesRequest config;
@@ -66,7 +70,7 @@ public class SnapshotRdfController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Problem parsing config json in body\"}";
+      return gson.toJson(new Success(false, "Problem parsing config json in body"));
     }
 
     try {
@@ -82,7 +86,7 @@ public class SnapshotRdfController {
       response.status(500);
       response.type("application/json");
       e.printStackTrace();
-      return "{\"success\":false,\"message\":\"Problem retrieving write operations: "+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, "Problem retrieving write operations: "+e.getMessage()+""));
     }
 
     try {
@@ -91,11 +95,11 @@ public class SnapshotRdfController {
     } catch(IOException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Could not write the write-ops to the container\"}";
+      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     config.cleanUp();
@@ -111,14 +115,14 @@ public class SnapshotRdfController {
     if(project == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide project\"}";
+      return gson.toJson(new Success(false, "Please provide project"));
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     List<String> graphs = new ArrayList<>();
@@ -132,7 +136,7 @@ public class SnapshotRdfController {
     if(graphs == null || graphs.size() < 1) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide at lease one graph name\"}";
+      return gson.toJson(new Success(false, "Please provide at lease one graph name"));
     }
 
     Weaver weaver;
@@ -141,7 +145,7 @@ public class SnapshotRdfController {
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"\"}";
+      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
     }
 
     AddTriplesRequest config;
@@ -153,7 +157,7 @@ public class SnapshotRdfController {
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Problem parsing config json in body\"}";
+      return gson.toJson(new Success(false, "Problem parsing config json in body"));
     }
 
     try {
@@ -169,7 +173,7 @@ public class SnapshotRdfController {
       response.status(500);
       response.type("application/json");
       e.printStackTrace();
-      return "{\"success\":false,\"message\":\"Problem retrieving write operations: "+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, "Problem retrieving write operations: "+e.getMessage()+""));
     }
 
     try {
@@ -178,12 +182,12 @@ public class SnapshotRdfController {
     } catch(IOException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Could not write the write-ops to the container\"}";
+      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
       e.printStackTrace();
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
     config.cleanUp();

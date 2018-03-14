@@ -1,8 +1,10 @@
 package com.weaverplatform.service.controllers;
 
 
+import com.google.gson.Gson;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.FileFromStoreRequest;
+import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
@@ -11,10 +13,11 @@ import spark.Route;
 
 public class StoreController {
 
-
   public static final String WEAVER_URI = Props.get("WEAVER_URI", "weaver.uri");
   public static final String USER = Props.get("SERVICE_USER","service.user");
   public static final String PASSWORD = Props.get("SERVICE_PASSWORD", "service.password");
+
+  public static Gson gson = new Gson();
 
   public static Weaver getWeaver(String project) {
     Weaver instance = new Weaver();
@@ -32,28 +35,28 @@ public class StoreController {
     if(project == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide project\"}";
+      return gson.toJson(new Success(false, "Please provide project"));
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     String path = request.queryParamOrDefault("path", null);
     if(path == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide path\"}";
+      return gson.toJson(new Success(false, "Please provide path"));
     }
 
     String fileId = request.queryParamOrDefault("fileId", null);
     if(fileId == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide fileId\"}";
+      return gson.toJson(new Success(false, "Please provide fileId"));
     }
 
     FileFromStoreRequest config = new FileFromStoreRequest();
@@ -67,7 +70,7 @@ public class StoreController {
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"\"}";
+      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
     }
 
     try {
@@ -89,14 +92,14 @@ public class StoreController {
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide zipKey\"}";
+      return gson.toJson(new Success(false, "Please provide zipKey"));
     }
 
     String project = request.queryParamOrDefault("project", null);
     if(zipKey == null) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Please provide project\"}";
+      return gson.toJson(new Success(false, "Please provide project"));
     }
 
     Weaver weaver;
@@ -105,7 +108,7 @@ public class StoreController {
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\"Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"\"}";
+      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
     }
 
     try {
@@ -113,11 +116,11 @@ public class StoreController {
 
       response.status(200);
       response.type("application/json");
-      return "{\"success\":true,\"fileId\":\""+fileId+"\"}";
+      return gson.toJson(new Success(true, "", fileId));
     } catch(Exception e) {
       response.status(500);
       response.type("application/json");
-      return "{\"success\":false,\"message\":\""+e.getMessage()+"\"}";
+      return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
   };
 

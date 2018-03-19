@@ -19,7 +19,7 @@ public class DownloadedPart implements Part {
   private File temp;
 
   public DownloadedPart() throws IOException {
-    this.temp = File.createTempFile("writeops-", ".tmp");
+    this.temp = File.createTempFile("writeops-", ".json.gz");
     logger.info("Storing writeops-json temporarily at "+this.temp.getPath());
   }
 

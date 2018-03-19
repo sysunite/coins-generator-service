@@ -20,8 +20,9 @@ import java.util.*;
  */
 public class RdfWriter {
 
-  private static final int CHUNK_SIZE = 1000000;
   static Logger logger = LoggerFactory.getLogger(RdfWriter.class);
+
+  final static int CHUNK_SIZE = Props.getInt("CHUNK_SIZE", "rdfwriter.chunksize");
 
   public static void write(List<Part> parts, AbstractRDFWriter writer, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
 

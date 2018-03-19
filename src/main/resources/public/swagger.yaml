@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create a coins-container and download it.
-  version: 0.1.1
+  version: 0.1.2
   title: coins-generator-service
   contact:
     email: info@sysunite.com

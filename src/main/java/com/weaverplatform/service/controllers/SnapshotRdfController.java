@@ -7,6 +7,8 @@ import com.weaverplatform.service.payloads.AddTriplesRequest;
 import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.DownloadedPart;
 import com.weaverplatform.service.util.ZipWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -20,6 +22,8 @@ import static com.weaverplatform.service.controllers.StoreController.getWeaver;
 
 public class SnapshotRdfController {
 
+  static Logger logger = LoggerFactory.getLogger(Application.class);
+
   public static Gson gson = new Gson();
 
   public static Route addXml = (Request request, Response response) -> {
@@ -30,6 +34,7 @@ public class SnapshotRdfController {
       response.type("application/json");
       return gson.toJson(new Success(false, "Please provide project"));
     }
+    logger.info("Using project '"+project+"'");
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
@@ -74,9 +79,12 @@ public class SnapshotRdfController {
     }
 
     try {
-      System.out.println(graphs.size());
       for(String graph : graphs) {
-        System.out.println("graph: "+graph);
+        if(graph == null) {
+          logger.info("Graph is null");
+        } else {
+          logger.info("Graph is '"+graph+"'");
+        }
         DownloadedPart part = new DownloadedPart();
         InputStream zippedStream = weaver.getSnapshotGraph(graph, true);
         part.writeZippedStream(zippedStream);
@@ -117,6 +125,7 @@ public class SnapshotRdfController {
       response.type("application/json");
       return gson.toJson(new Success(false, "Please provide project"));
     }
+    logger.info("Using project '"+project+"'");
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
@@ -161,9 +170,12 @@ public class SnapshotRdfController {
     }
 
     try {
-      System.out.println(graphs.size());
       for(String graph : graphs) {
-        System.out.println("graph: "+graph);
+        if(graph == null) {
+          logger.info("Graph is null");
+        } else {
+          logger.info("Graph is '"+graph+"'");
+        }
         DownloadedPart part = new DownloadedPart();
         InputStream zippedStream = weaver.getSnapshotGraph(graph, true);
         part.writeZippedStream(zippedStream);

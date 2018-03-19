@@ -1,6 +1,8 @@
 package com.weaverplatform.service.util;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Part;
 import java.io.*;
@@ -12,10 +14,13 @@ import java.util.zip.GZIPInputStream;
  */
 public class DownloadedPart implements Part {
 
+  static Logger logger = LoggerFactory.getLogger(DownloadedPart.class);
+
   private File temp;
 
   public DownloadedPart() throws IOException {
     this.temp = File.createTempFile("writeops-", ".tmp");
+    logger.info("Storing writeops-json temporarily at "+this.temp.getPath());
   }
 
   @Override

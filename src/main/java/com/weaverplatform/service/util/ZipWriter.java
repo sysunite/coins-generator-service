@@ -2,8 +2,11 @@ package com.weaverplatform.service.util;
 
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.sdk.WeaverFile;
+import com.weaverplatform.service.Application;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
@@ -16,6 +19,8 @@ import java.util.Map;
  * @author bastbijl, Sysunite 2018
  */
 public class ZipWriter {
+
+  static Logger logger = LoggerFactory.getLogger(Application.class);
 
   private static final int BLOCK_RETRY_TIME_MS = 3000;
   private static final int BLOCK_RETRIES = 10;
@@ -42,6 +47,8 @@ public class ZipWriter {
 
   public static void addXmlToZip(String zipKey, AddTriplesRequest config) throws IOException {
 
+    logger.info("Will add rdf/xml to zip "+zipKey);
+
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
@@ -52,6 +59,8 @@ public class ZipWriter {
   }
 
   public static void addTtlToZip(String zipKey, AddTriplesRequest config) throws IOException {
+
+    logger.info("Will add ttl to zip "+zipKey);
 
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());

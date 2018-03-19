@@ -6,6 +6,8 @@ import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFWriter;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.*;
 public class RdfWriter {
 
   private static final int CHUNK_SIZE = 1000000;
+  static Logger logger = LoggerFactory.getLogger(RdfWriter.class);
 
   public static void write(List<Part> parts, AbstractRDFWriter writer, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
 
@@ -44,6 +47,7 @@ public class RdfWriter {
           TreeSet<SuperOperation> operations = parser.parseNextSorted(inputStream, CHUNK_SIZE, filterChar);
 
           while (!operations.isEmpty()) {
+            logger.info("Got "+operations.size()+" when looking for filter char '"+filterChar+"'");
 
             if (operations.size() >= CHUNK_SIZE) {
               throw new RuntimeException("Please try to increase chunk size, not able to sort like this");

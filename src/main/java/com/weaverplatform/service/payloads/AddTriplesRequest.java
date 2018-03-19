@@ -92,7 +92,6 @@ public class AddTriplesRequest {
 
   public static AddTriplesRequest fromBody(Request request) throws IOException, ServletException {
     AddTriplesRequest result  = new Gson().fromJson(request.body(), AddTriplesRequest.class);
-    System.out.println(request.body());
     return result;
   }
 

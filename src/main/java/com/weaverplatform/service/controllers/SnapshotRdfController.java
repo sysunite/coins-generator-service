@@ -22,7 +22,7 @@ import static com.weaverplatform.service.controllers.StoreController.getWeaver;
 
 public class SnapshotRdfController {
 
-  static Logger logger = LoggerFactory.getLogger(Application.class);
+  static Logger logger = LoggerFactory.getLogger(SnapshotRdfController.class);
 
   public static Gson gson = new Gson();
 

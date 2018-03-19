@@ -48,7 +48,7 @@ public class SnapshotRdfController {
 
     List<String> graphs = new ArrayList<>();
     for(String graph : request.queryParamsValues("graphs")) {
-      if(graph == null || "null".equals(graph) || "undefined".equals(graph)) {
+      if(graph == null || graph.isEmpty() || "null".equals(graph) || "undefined".equals(graph)) {
         graphs.add(null); // for the default graph
       } else {
         graphs.add(graph);
@@ -141,7 +141,7 @@ public class SnapshotRdfController {
 
     List<String> graphs = new ArrayList<>();
     for(String graph : request.queryParamsValues("graphs")) {
-      if(graph == null || "null".equals(graph) || "undefined".equals(graph)) {
+      if(graph == null || graph.isEmpty() || "null".equals(graph) || "undefined".equals(graph)) {
         graphs.add(null); // for the default graph
       } else {
         graphs.add(graph);

@@ -6,6 +6,7 @@ import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
 import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.DownloadedPart;
+import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ public class SnapshotRdfController {
   static Logger logger = LoggerFactory.getLogger(SnapshotRdfController.class);
 
   public static Gson gson = new Gson();
+
+  final static Boolean AUTO_CLEAN = Props.getBoolean("AUTO_CLEAN", "service.autoclean");
 
   public static Route addXml = (Request request, Response response) -> {
 
@@ -110,7 +113,9 @@ public class SnapshotRdfController {
       return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
-    config.cleanUp();
+    if(AUTO_CLEAN) {
+      config.cleanUp();
+    }
 
     response.status(200);
     response.type("application/json");
@@ -202,7 +207,9 @@ public class SnapshotRdfController {
       return gson.toJson(new Success(false, ""+e.getMessage()+""));
     }
 
-    config.cleanUp();
+    if(AUTO_CLEAN) {
+      config.cleanUp();
+    }
 
     response.status(200);
     response.type("application/json");

@@ -109,7 +109,7 @@ paths:
         '200':
           description: succes
 
-  extractTtl:
+  /extractTtl:
     post:
       description: >-
         Create gzipped write operations json based on file in

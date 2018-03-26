@@ -44,8 +44,8 @@ public class Application {
     get("/fileFromStore",       StoreController.fileFromStore);
 
     post("/addFile",            ContainerController.addFile);
-    post("/addRdf",             RdfController.addXml);
-    post("/addTtl",             RdfController.addTtl);
+    post("/addRdf",             AddTriplesController.addXml);
+    post("/addTtl",             AddTriplesController.addTtl);
 
     post("/addRdfFromSnapshot", SnapshotRdfController.addXml);
     post("/addTtlFromSnapshot", SnapshotRdfController.addTtl);

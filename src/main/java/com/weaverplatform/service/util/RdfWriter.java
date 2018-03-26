@@ -26,7 +26,7 @@ public class RdfWriter {
 
   public static void write(List<Part> parts, AbstractRDFWriter writer, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
 
-    Set<Character> filterChars = new HashSet<>();
+    Set<Character> filterChars = new TreeSet<>();
     for(Part part : parts) {
       try (InputStream inputStream = part.getInputStream()) {
         filterChars.addAll(SortedWriteOperationParser.startChars(inputStream));

@@ -10,10 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.FileSystem;
 import java.nio.file.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author bastbijl, Sysunite 2018
@@ -69,6 +72,19 @@ public class ZipWriter {
       }
     }
     freeZipKey(zipKey);
+  }
+
+  public static InputStream readFromZip(InputStream input, String path) throws IOException {
+    ZipInputStream zipStream = new ZipInputStream(input);
+    while(zipStream.available() > 0) {
+      ZipEntry entry = zipStream.getNextEntry();
+
+      if (entry.getName().equals(path)) {
+        logger.info("Found entry with name " + path);
+        return zipStream;
+      }
+    }
+    return null;
   }
 
   private static synchronized File requestAccess(String zipKey) {

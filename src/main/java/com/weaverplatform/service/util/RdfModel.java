@@ -69,6 +69,7 @@ public abstract class RdfModel implements Model {
   protected List<Filter> filters = new ArrayList<>();
 
   protected String currentPrefix = null;
+  protected String defaultGraph = null;
 
   protected final HashMap<String, Item> items = new HashMap<>();
 
@@ -188,7 +189,7 @@ public abstract class RdfModel implements Model {
       return items.get(finalId);
     }
 
-    Item item = new Item(finalId, currentPrefix);
+    Item item = new Item(finalId, defaultGraph);
     items.put(finalId, item);
     return item;
   }

@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create a coins-container and download it.
-  version: 0.1.2
+  version: 0.2.0
   title: coins-generator-service
   contact:
     email: info@sysunite.com
@@ -83,6 +83,50 @@ paths:
           name: payload
           type: file
           description: write operations json file
+      responses:
+        '200':
+          description: succes
+
+  /extractRdf:
+    post:
+      description: >-
+        Create an rdf/xml file in the container
+      operationId: extractRdf
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: config
+          type: string
+          description: config json (fields are path, prefixMap, toGraph)
+        - in: formData
+          name: payload
+          type: file
+          description: write operations json file
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: succes
+
+  extractTtl:
+    post:
+      description: >-
+        Create gzipped write operations json based on file in
+      operationId: extractTtl
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: config
+          type: string
+          description: config json (fields are path, prefixMap, toGraph)
+        - in: formData
+          name: payload
+          type: file
+          description: write operations json file
+      produces:
+        - application/json
       responses:
         '200':
           description: succes

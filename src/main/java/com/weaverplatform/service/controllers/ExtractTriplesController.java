@@ -4,7 +4,7 @@ package com.weaverplatform.service.controllers;
 import com.google.gson.Gson;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
 import com.weaverplatform.service.payloads.Success;
-import com.weaverplatform.service.util.ZipExtracter;
+import com.weaverplatform.service.util.WriteOperationsExtractor;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -28,8 +28,10 @@ public class ExtractTriplesController {
 
     response.status(200);
     response.type("application/json");
+    response.header("Content-Encoding", "gzip");
+
     try {
-      ZipExtracter.writeOperationsXml(response.raw().getOutputStream(), config);
+      WriteOperationsExtractor.writeOperationsXml(response.raw().getOutputStream(), config);
 
     } catch(IOException e) {
       response.status(500);
@@ -57,8 +59,10 @@ public class ExtractTriplesController {
 
     response.status(200);
     response.type("application/json");
+    response.header("Content-Encoding", "gzip");
+
     try {
-      ZipExtracter.writeOperationsTtl(response.raw().getOutputStream(), config);
+      WriteOperationsExtractor.writeOperationsTtl(response.raw().getOutputStream(), config);
 
     } catch(IOException e) {
       response.status(500);

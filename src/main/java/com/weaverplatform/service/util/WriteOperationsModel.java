@@ -31,6 +31,10 @@ public class WriteOperationsModel extends RdfModel {
     this.user = user;
   }
 
+  public void setGraph(String graph) {
+    this.defaultGraph = graph;
+  }
+
 
 
   @Override

@@ -55,7 +55,7 @@ public class ZipWriter {
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeXml(config.getPayloads(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
+        RdfWriter.writeXml(config, out);
       }
     }
     freeZipKey(zipKey);
@@ -68,7 +68,7 @@ public class ZipWriter {
     try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
       Path nf = fs.getPath(config.getPath());
       try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeTtl(config.getPayloads(), out, config.getPrefixMap(), config.getMainContext(), config.getDefaultPrefix());
+        RdfWriter.writeTtl(config, out);
       }
     }
     freeZipKey(zipKey);

@@ -89,6 +89,10 @@ public class AddTriplesRequest {
     return reify;
   }
 
+  public boolean reify() {
+    return reify != null && reify;
+  }
+
   public static AddTriplesRequest fromMultipart(Request request) throws IOException, ServletException {
     MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp/multipart");
     request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);

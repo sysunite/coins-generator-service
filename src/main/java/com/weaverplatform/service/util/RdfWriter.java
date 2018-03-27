@@ -3,6 +3,7 @@ package com.weaverplatform.service.util;
 import com.weaverplatform.protocol.SortedWriteOperationParser;
 import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.service.RDFXMLBasePrettyWriter;
+import com.weaverplatform.service.payloads.AddTriplesRequest;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.helpers.AbstractRDFWriter;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
@@ -24,10 +25,10 @@ public class RdfWriter {
 
   final static int CHUNK_SIZE = Props.getInt("CHUNK_SIZE", "rdfwriter.chunksize");
 
-  public static void write(List<Part> parts, AbstractRDFWriter writer, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
+  public static void write(AddTriplesRequest config, AbstractRDFWriter writer) {
 
     Set<Character> filterChars = new TreeSet<>();
-    for(Part part : parts) {
+    for(Part part : config.getPayloads()) {
       try (InputStream inputStream = part.getInputStream()) {
         filterChars.addAll(SortedWriteOperationParser.startChars(inputStream));
       } catch (IOException e) {
@@ -35,12 +36,17 @@ public class RdfWriter {
       }
     }
 
-    CoinsMapper mapper = new CoinsMapper(mainContext, defaultPrefix, prefixMap);
+    CoinsMapper mapper;
+    if(config.reify()) {
+      mapper = new ReifiedCoinsMapper(config.getMainContext(), config.getDefaultPrefix(), config.getPrefixMap());
+    } else {
+      mapper = new CoinsMapper(config.getMainContext(), config.getDefaultPrefix(), config.getPrefixMap());
+    }
     writer.startRDF();
 
     for(Character filterChar : filterChars) {
 
-      for(Part part : parts) {
+      for(Part part : config.getPayloads()) {
         SortedWriteOperationParser parser = new SortedWriteOperationParser();
         try (InputStream inputStream = part.getInputStream()) {
 
@@ -55,9 +61,10 @@ public class RdfWriter {
             }
 
             for (SuperOperation operation : operations) {
-              Statement statement = mapper.map(operation);
-              if (statement != null) {
-                writer.handleStatement(statement);
+              for(Statement statement : mapper.map(operation)) {
+                if (statement != null) {
+                  writer.handleStatement(statement);
+                }
               }
             }
 
@@ -71,15 +78,15 @@ public class RdfWriter {
     writer.endRDF();
   }
 
-  public static void writeXml(List<Part> sources, OutputStream output, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
+  public static void writeXml(AddTriplesRequest config, OutputStream output) {
 
     RDFXMLBasePrettyWriter writer = new RDFXMLBasePrettyWriter(output);
-    writer.setBase(mainContext);
-    writer.handleNamespace("", mainContext+"#");
-    for(String prefix : prefixMap.keySet()) {
-      writer.handleNamespace(prefix, prefixMap.get(prefix));
+    writer.setBase(config.getMainContext());
+    writer.handleNamespace("", config.getMainContext()+"#");
+    for(String prefix : config.getPrefixMap().keySet()) {
+      writer.handleNamespace(prefix, config.getPrefixMap().get(prefix));
     }
-    write(sources, writer, prefixMap, mainContext, defaultPrefix);
+    write(config, writer);
     try {
       output.flush();
     } catch (IOException e) {
@@ -87,14 +94,14 @@ public class RdfWriter {
     }
   }
 
-  public static void writeTtl(List<Part> sources, OutputStream output, Map<String, String> prefixMap, String mainContext, String defaultPrefix) {
+  public static void writeTtl(AddTriplesRequest config, OutputStream output) {
 
     TurtleWriter writer = new TurtleWriter(output);
-    writer.handleNamespace("", mainContext+"#");
-    for(String prefix : prefixMap.keySet()) {
-      writer.handleNamespace(prefix, prefixMap.get(prefix));
+    writer.handleNamespace("", config.getMainContext()+"#");
+    for(String prefix : config.getPrefixMap().keySet()) {
+      writer.handleNamespace(prefix, config.getPrefixMap().get(prefix));
     }
-    write(sources, writer, prefixMap, mainContext, defaultPrefix);
+    write(config, writer);
     try {
       output.flush();
     } catch (IOException e) {

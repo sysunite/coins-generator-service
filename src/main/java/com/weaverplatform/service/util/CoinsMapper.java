@@ -1,6 +1,7 @@
 package com.weaverplatform.service.util;
 
-import com.weaverplatform.protocol.model.*;
+import com.weaverplatform.protocol.model.AttributeDataType;
+import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.util.DataTypeUtil;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;
@@ -12,6 +13,8 @@ import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.weaverplatform.protocol.model.AttributeDataType.RDF_LANGSTRING;
@@ -20,11 +23,11 @@ public class CoinsMapper {
 
   private static Logger log = LoggerFactory.getLogger(CoinsMapper.class);
 
-  private static ValueFactory valueFactory = SimpleValueFactory.getInstance();
+  protected static ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
-  private IRI context;
-  private String defaultPrefix;
-  private Map<String, String> uris;
+  protected IRI context;
+  protected String defaultPrefix;
+  protected Map<String, String> uris;
 
   public CoinsMapper(String context, String defaultPrefix, Map uris) {
     this.context = getIRI(context);
@@ -32,44 +35,31 @@ public class CoinsMapper {
     this.uris = uris;
   }
 
+  public List<Statement> map(SuperOperation operation) {
 
-
-
-
-
-
-  public  Statement map(SuperOperation operation) {
+    ArrayList<Statement> list = new ArrayList<>();
 
     if("create-node".equals(operation.getAction())) {
-      return createIndividual(operation);
+      return list;
     }
 
     if("create-attribute".equals(operation.getAction())) {
       if (operation.isReplacing()) {
         throw new RuntimeException("Removes or replaces not allowed");
       }
-      return createAttribute(operation);
+      list.add(createAttribute(operation));
+      return list;
     }
 
     if("create-relation".equals(operation.getAction())) {
       if (operation.isReplacing()) {
         throw new RuntimeException("Removes or replaces not allowed");
       }
-      return createRelation(operation);
-    }
-
-    if("create-relation".equals(operation.getAction()) ||
-      "create-relation".equals(operation.getAction()) ||
-      "create-relation".equals(operation.getAction()) ||
-      "create-relation".equals(operation.getAction())) {
-        throw new RuntimeException("Removes or replaces not allowed for Coins2-1 profile.");
+      list.add(createRelation(operation));
+      return list;
     }
 
     throw new RuntimeException("This operation is not supported: "+operation.getAction());
-  }
-
-  private Statement createIndividual(SuperOperation payload) {
-    return null;
   }
 
   private Statement createAttribute(SuperOperation payload) {
@@ -88,7 +78,7 @@ public class CoinsMapper {
 
 
 
-  private IRI getIRI(String string) {
+  protected IRI getIRI(String string) {
     if(string.indexOf(":") == -1) {
       string = defaultPrefix + ":" + string;
     }

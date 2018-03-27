@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  description: Create a coins-container and download it.
+  description: Create rdf files inside zip archives.
   version: 0.3.0
-  title: coins-generator-service
+  title: rdf-export-service
   contact:
     email: info@sysunite.com
   license:

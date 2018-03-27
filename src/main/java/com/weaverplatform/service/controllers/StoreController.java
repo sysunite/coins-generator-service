@@ -7,11 +7,16 @@ import com.weaverplatform.service.payloads.FileFromStoreRequest;
 import com.weaverplatform.service.payloads.Success;
 import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 public class StoreController {
+
+  static Logger logger = LoggerFactory.getLogger(StoreController.class);
+
 
   public static final String WEAVER_URI = Props.get("WEAVER_URI", "weaver.uri");
   public static final String USER = Props.get("SERVICE_USER","service.user");
@@ -29,6 +34,14 @@ public class StoreController {
     return instance;
   }
 
+  public static Weaver getWeaver(String project, String autToken) {
+    Weaver instance = new Weaver();
+    instance.setUri(WEAVER_URI);
+    instance.setAuthToken(autToken);
+    instance.setProject(project);
+    return instance;
+  }
+
   public static Route fileFromStore = (Request request, Response response) -> {
 
     String project = request.queryParamOrDefault("project", null);
@@ -36,6 +49,13 @@ public class StoreController {
       response.status(500);
       response.type("application/json");
       return gson.toJson(new Success(false, "Please provide project"));
+    }
+
+    String authToken = request.queryParamOrDefault("user", null);
+    if(authToken == null) {
+      response.status(500);
+      response.type("application/json");
+      return gson.toJson(new Success(false, "Please provide authToken"));
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
@@ -66,7 +86,7 @@ public class StoreController {
 
     Weaver weaver;
     try {
-      weaver = getWeaver(project);
+      weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
@@ -102,9 +122,16 @@ public class StoreController {
       return gson.toJson(new Success(false, "Please provide project"));
     }
 
+    String authToken = request.queryParamOrDefault("user", null);
+    if(authToken == null) {
+      response.status(500);
+      response.type("application/json");
+      return gson.toJson(new Success(false, "Please provide authToken"));
+    }
+
     Weaver weaver;
     try {
-      weaver = getWeaver(project);
+      weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");

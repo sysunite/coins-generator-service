@@ -1,8 +1,11 @@
 package com.weaverplatform.service.util;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.protocol.model.WriteOperation;
+import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.Application;
 import com.weaverplatform.service.controllers.StoreController;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
@@ -15,7 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Part;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -26,16 +30,20 @@ public class WriteOperationsExtractor {
 
   static Logger logger = LoggerFactory.getLogger(Application.class);
 
-  public static void writeOperationsXml(OutputStream stream, ExtractTriplesRequest config) {
-    execute(config, stream, new RDFXMLParser());
+  public static final int WRITE_BATCH_SIZE = 1000;
+
+  public static Gson gson = new Gson();
+
+  public static void writeOperationsXml(ExtractTriplesRequest config, Weaver weaver) {
+    execute(config, weaver, new RDFXMLParser());
   }
 
-  public static void writeOperationsTtl(OutputStream stream, ExtractTriplesRequest config) {
-    execute(config, stream, new TurtleParser());
+  public static void writeOperationsTtl(ExtractTriplesRequest config, Weaver weaver) {
+    execute(config, weaver, new TurtleParser());
   }
 
 
-  public static void execute(ExtractTriplesRequest config, OutputStream stream, RDFParser parser) {
+  public static void execute(ExtractTriplesRequest config, Weaver weaver, RDFParser parser) {
 
     List<Part> inputs = config.getPayloads();
 
@@ -61,39 +69,25 @@ public class WriteOperationsExtractor {
         logger.error("Requested stream for path "+config.getPath() + " could not be found in container file.");
       }
     }
-    writeTo(model, stream);
+    writeTo(model, weaver);
   }
 
 
-  private static void writeTo(WriteOperationsModel model, OutputStream output) {
+  private static void writeTo(WriteOperationsModel model, Weaver weaver) {
 
-    try {
-      BufferedOutputStream osb = new BufferedOutputStream(output, 8 * 1024);
-      JsonWriter writer = new JsonWriter(new OutputStreamWriter(osb));
-      writer.setIndent("  ");
-      writer.beginArray();
+    int total = 0;
+    while(model.hasNext()) {
 
-      int total = 0;
-      while(model.hasNext()) {
-
-        List<WriteOperation> items = model.next(1);
-        if(items.isEmpty()) {
-          continue;
-        }
-        WriteOperation item = items.get(0);
-        total++;
-        Gson gson = new Gson();
-        gson.toJson(item, item.getClass(), writer);
-
+      List<WriteOperation> items = model.next(WRITE_BATCH_SIZE);
+      if(items.isEmpty()) {
+        continue;
       }
+      total += items.size();
 
-      writer.endArray();
-      writer.close();
-
-      logger.info("Inserted " + total + " write operations");
-
-    } catch (IOException e) {
-      e.printStackTrace();
+      JsonElement element = gson.toJsonTree(items, new TypeToken<List<SuperOperation>>() {}.getType());
+      weaver.reallySendCreate(element.getAsJsonArray(), false);
     }
+
+    logger.info("Inserted " + total + " write operations");
   }
 }

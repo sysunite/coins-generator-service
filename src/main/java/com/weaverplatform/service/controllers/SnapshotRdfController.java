@@ -39,6 +39,13 @@ public class SnapshotRdfController {
     }
     logger.info("Using project '"+project+"'");
 
+    String authToken = request.queryParamOrDefault("user", null);
+    if(authToken == null) {
+      response.status(500);
+      response.type("application/json");
+      return gson.toJson(new Success(false, "Please provide authToken"));
+    }
+
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
@@ -62,7 +69,7 @@ public class SnapshotRdfController {
 
     Weaver weaver;
     try {
-      weaver = getWeaver(project);
+      weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");
@@ -132,6 +139,13 @@ public class SnapshotRdfController {
     }
     logger.info("Using project '"+project+"'");
 
+    String authToken = request.queryParamOrDefault("user", null);
+    if(authToken == null) {
+      response.status(500);
+      response.type("application/json");
+      return gson.toJson(new Success(false, "Please provide authToken"));
+    }
+
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
       response.status(500);
@@ -155,7 +169,7 @@ public class SnapshotRdfController {
 
     Weaver weaver;
     try {
-      weaver = getWeaver(project);
+      weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
       response.status(500);
       response.type("application/json");

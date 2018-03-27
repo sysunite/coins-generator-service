@@ -34,6 +34,9 @@ public class AddTriplesRequest {
   @Expose
   private String path;
 
+  @Expose
+  private Boolean reify;
+
 
   public void addPayload(Part payload) {
     if(this.payloads == null) {
@@ -76,6 +79,14 @@ public class AddTriplesRequest {
 
   public String getPath() {
     return path;
+  }
+
+  public void setReify(Boolean reify) {
+    this.reify = reify;
+  }
+
+  public Boolean getReify() {
+    return reify;
   }
 
   public static AddTriplesRequest fromMultipart(Request request) throws IOException, ServletException {

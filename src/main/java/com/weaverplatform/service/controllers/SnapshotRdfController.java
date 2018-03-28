@@ -4,7 +4,7 @@ package com.weaverplatform.service.controllers;
 import com.google.gson.Gson;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
-import com.weaverplatform.service.payloads.Success;
+import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.DownloadedPart;
 import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
@@ -14,7 +14,6 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,28 +28,22 @@ public class SnapshotRdfController {
 
   final static Boolean AUTO_CLEAN = Props.getBoolean("AUTO_CLEAN", "service.autoclean");
 
-  public static Route addXml = (Request request, Response response) -> {
+  public static Route add = (Request request, Response response) -> {
 
     String project = request.queryParamOrDefault("project", null);
     if(project == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide project"));
+      return new JobReport(false, "Please provide project").toString(response);
     }
     logger.info("Using project '"+project+"'");
 
     String authToken = request.queryParamOrDefault("user", null);
     if(authToken == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide authToken"));
+      return new JobReport(false, "Please provide authToken").toString(response);
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     List<String> graphs = new ArrayList<>();
@@ -62,18 +55,14 @@ public class SnapshotRdfController {
       }
     }
     if(graphs == null || graphs.size() < 1) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide at lease one graph name"));
+      return new JobReport(false, "Please provide at lease one graph name").toString(response);
     }
 
     Weaver weaver;
     try {
       weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
+      return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
     }
 
     AddTriplesRequest config;
@@ -83,9 +72,7 @@ public class SnapshotRdfController {
         throw new RuntimeException();
       }
     } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Problem parsing config json in body"));
+      return new JobReport(false, "Problem parsing config json in body").toString(response);
     }
 
     try {
@@ -101,133 +88,25 @@ public class SnapshotRdfController {
         config.addPayload(part);
       }
     } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      e.printStackTrace();
-      return gson.toJson(new Success(false, "Problem retrieving write operations: "+e.getMessage()+""));
+      return new JobReport(false, "Problem retrieving write operations: "+e.getMessage()+"").toString(response);
     }
 
-    try {
-      ZipWriter.addXmlToZip(zipKey, config);
-
-    } catch(IOException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
+    if(!"turtle".equals(config.getRdfFormat().toLowerCase()) &&
+       !"rdf/xml".equals(config.getRdfFormat().toLowerCase())) {
+      return new JobReport(false, "Please set rdfFormat to either 'turtle' or 'rdf/xml'").toString(response);
     }
 
-    if(AUTO_CLEAN) {
-      config.cleanUp();
-    }
-
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
-  };
-
-  public static Route addTtl = (Request request, Response response) -> {
-
-    String project = request.queryParamOrDefault("project", null);
-    if(project == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide project"));
-    }
-    logger.info("Using project '"+project+"'");
-
-    String authToken = request.queryParamOrDefault("user", null);
-    if(authToken == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide authToken"));
-    }
-
-    String zipKey = request.queryParamOrDefault("zipKey", null);
-    if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
-    }
-
-    List<String> graphs = new ArrayList<>();
-    for(String graph : request.queryParamsValues("graphs")) {
-      if(graph == null || graph.isEmpty() || "null".equals(graph) || "undefined".equals(graph)) {
-        graphs.add(null); // for the default graph
-      } else {
-        graphs.add(graph);
-      }
-    }
-    if(graphs == null || graphs.size() < 1) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide at lease one graph name"));
-    }
-
-    Weaver weaver;
-    try {
-      weaver = getWeaver(project, authToken);
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
-    }
-
-    AddTriplesRequest config;
-    try {
-      config = AddTriplesRequest.fromBody(request);
-      if(config == null) {
-        throw new RuntimeException();
-      }
-    } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Problem parsing config json in body"));
-    }
-
-    try {
-      for(String graph : graphs) {
-        if(graph == null) {
-          logger.info("Graph is null");
-        } else {
-          logger.info("Graph is '"+graph+"'");
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        ZipWriter.addRdfToZip(zipKey, config, job);
+        if(AUTO_CLEAN) {
+          config.cleanUp();
         }
-        DownloadedPart part = new DownloadedPart();
-        InputStream zippedStream = weaver.getSnapshotGraph(graph, true);
-        part.writeZippedStream(zippedStream);
-        config.addPayload(part);
       }
-    } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      e.printStackTrace();
-      return gson.toJson(new Success(false, "Problem retrieving write operations: "+e.getMessage()+""));
-    }
+    }.start();
 
-    try {
-      ZipWriter.addTtlToZip(zipKey, config);
-
-    } catch(IOException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      e.printStackTrace();
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
-    }
-
-    if(AUTO_CLEAN) {
-      config.cleanUp();
-    }
-
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+    return job.toString(response);
   };
 
 }

@@ -32,6 +32,9 @@ public class AddTriplesRequest {
   private String mainContext;
 
   @Expose
+  private String rdfFormat;
+
+  @Expose
   private String path;
 
   @Expose
@@ -71,6 +74,14 @@ public class AddTriplesRequest {
 
   public String getMainContext() {
     return mainContext;
+  }
+
+  public void setRdfFormat(String rdfFormat) {
+    this.rdfFormat = rdfFormat;
+  }
+
+  public String getRdfFormat() {
+    return rdfFormat;
   }
 
   public void setPath(String path) {

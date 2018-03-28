@@ -3,88 +3,42 @@ package com.weaverplatform.service.controllers;
 
 import com.google.gson.Gson;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
-import com.weaverplatform.service.payloads.Success;
+import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.io.IOException;
-
 public class AddTriplesController {
 
   public static Gson gson = new Gson();
 
-  public static Route addXml = (Request request, Response response) -> {
+  public static Route add = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     AddTriplesRequest config;
     try {
       config = AddTriplesRequest.fromMultipart(request);
     } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
+      return new JobReport(false, "Problem parsing config json in multi-part").toString(response);
     }
 
-    try {
-      ZipWriter.addXmlToZip(zipKey, config);
-
-    } catch(IOException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
+    if(!"turtle".equals(config.getRdfFormat().toLowerCase()) &&
+    !"rdf/xml".equals(config.getRdfFormat().toLowerCase())) {
+      return new JobReport(false, "Please set rdfFormat to either 'turtle' or 'rdf/xml'").toString(response);
     }
 
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
-  };
-
-  public static Route addTtl = (Request request, Response response) -> {
-
-    String zipKey = request.queryParamOrDefault("zipKey", null);
-    if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
-    }
-
-    AddTriplesRequest config;
-    try {
-      config = AddTriplesRequest.fromMultipart(request);
-    } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
-    }
-
-    try {
-      ZipWriter.addTtlToZip(zipKey, config);
-
-    } catch(IOException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Could not write the write-ops to the container"));
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
-    }
-
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        ZipWriter.addRdfToZip(zipKey, config, job);
+      }
+    }.start();
+    return job.toString(response);
   };
 
 }

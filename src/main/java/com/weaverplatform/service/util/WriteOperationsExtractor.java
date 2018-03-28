@@ -9,6 +9,7 @@ import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.Application;
 import com.weaverplatform.service.controllers.StoreController;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
+import com.weaverplatform.service.payloads.JobReport;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;
 import org.eclipse.rdf4j.rio.RDFParser;
@@ -34,16 +35,17 @@ public class WriteOperationsExtractor {
 
   public static Gson gson = new Gson();
 
-  public static void writeOperationsXml(ExtractTriplesRequest config, Weaver weaver) {
-    execute(config, weaver, new RDFXMLParser());
-  }
+  public static void writeOperations(ExtractTriplesRequest config, Weaver weaver, JobReport job) {
 
-  public static void writeOperationsTtl(ExtractTriplesRequest config, Weaver weaver) {
-    execute(config, weaver, new TurtleParser());
-  }
+    RDFParser parser;
 
-
-  public static void execute(ExtractTriplesRequest config, Weaver weaver, RDFParser parser) {
+    if("turtle".equals(config.getRdfFormat().toLowerCase())) {
+      parser = new TurtleParser();
+    } else if("rdf/xml".equals(config.getRdfFormat().toLowerCase())) {
+      parser = new RDFXMLParser();
+    } else {
+      return;
+    }
 
     List<Part> inputs = config.getPayloads();
 
@@ -70,6 +72,7 @@ public class WriteOperationsExtractor {
       }
     }
     writeTo(model, weaver);
+    job.setSuccess(true);
   }
 
 

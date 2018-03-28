@@ -59,7 +59,7 @@ public class Cuid {
     return (padded).substring(padded.length() - size);
   }
 
-  private static String getRandomBlock() {
+  public static String getRandomBlock() {
     return pad(Integer.toString((int) (Math.random() * DISCRETE_VALUES), BASE), BLOCK_SIZE);
   }
 

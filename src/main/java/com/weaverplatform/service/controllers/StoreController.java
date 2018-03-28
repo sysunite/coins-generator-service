@@ -4,7 +4,7 @@ package com.weaverplatform.service.controllers;
 import com.google.gson.Gson;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.FileFromStoreRequest;
-import com.weaverplatform.service.payloads.Success;
+import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
 import org.slf4j.Logger;
@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.io.IOException;
 
 public class StoreController {
 
@@ -46,37 +48,27 @@ public class StoreController {
 
     String project = request.queryParamOrDefault("project", null);
     if(project == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide project"));
+      return new JobReport(false, "Please provide project").toString(response);
     }
 
     String authToken = request.queryParamOrDefault("user", null);
     if(authToken == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide authToken"));
+      return new JobReport(false, "Please provide authToken").toString(response);
     }
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     String path = request.queryParamOrDefault("path", null);
     if(path == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide path"));
+      return new JobReport(false, "Please provide path").toString(response);
     }
 
     String fileId = request.queryParamOrDefault("fileId", null);
     if(fileId == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide fileId"));
+      return new JobReport(false, "Please provide fileId").toString(response);
     }
 
     FileFromStoreRequest config = new FileFromStoreRequest();
@@ -88,67 +80,63 @@ public class StoreController {
     try {
       weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
+      return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
     }
 
-    try {
-      config.setFile(weaver.downloadFile(config.getFileId()));
-      ZipWriter.addToZip(zipKey, config);
-    } catch(Exception e) {
-      response.status(500);
-      response.body(e.getMessage());
-    }
 
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        try {
+          job.setProgress(0);
+          job.setScale(2);
+          config.setFile(weaver.downloadFile(config.getFileId()));
+          job.setProgress(1);
+          ZipWriter.addToZip(zipKey, config);
+          job.setProgress(2);
+          job.setSuccess(true);
+        } catch (IOException e) {
+          job.setSuccess(false);
+          job.setMessage(e.getMessage());
+        }
+      }
+    }.start();
+    return job.toString(response);
   };
 
   public static Route containerToStore = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     String project = request.queryParamOrDefault("project", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide project"));
+      return new JobReport(false, "Please provide project").toString(response);
     }
 
     String authToken = request.queryParamOrDefault("user", null);
     if(authToken == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide authToken"));
+      return new JobReport(false, "Please provide authToken").toString(response);
     }
 
     Weaver weaver;
     try {
       weaver = getWeaver(project, authToken);
     } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+""));
+      return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
     }
 
-    try {
-      String fileId = ZipWriter.streamDownload(zipKey, weaver).getId();
 
-      response.status(200);
-      response.type("application/json");
-      return gson.toJson(new Success(true, "", fileId));
-    } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
-    }
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        ZipWriter.streamDownload(zipKey, weaver, job);
+      }
+    }.start();
+    return job.toString(response);
   };
 
 }

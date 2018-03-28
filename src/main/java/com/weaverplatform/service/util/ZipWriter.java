@@ -3,8 +3,12 @@ package com.weaverplatform.service.util;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.sdk.WeaverFile;
 import com.weaverplatform.service.Application;
+import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
+import com.weaverplatform.service.payloads.JobReport;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,31 +52,36 @@ public class ZipWriter {
     freeZipKey(zipKey);
   }
 
-  public static void addXmlToZip(String zipKey, AddTriplesRequest config) throws IOException {
+  public static void addRdfToZip(String zipKey, AddTriplesRequest config, JobReport job) {
 
-    logger.info("Will add rdf/xml to zip "+zipKey);
+    logger.info("Will add rdf to zip "+zipKey);
+    try {
+      try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
+        Path nf = fs.getPath(config.getPath());
+        try (OutputStream output = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
 
-    try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
-      Path nf = fs.getPath(config.getPath());
-      try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeXml(config, out);
+
+          RDFWriter writer;
+          if("turtle".equals(config.getRdfFormat().toLowerCase())) {
+            writer = new TurtleWriter(output);
+          } else if("rdf/xml".equals(config.getRdfFormat().toLowerCase())) {
+            writer = new RDFXMLBasePrettyWriter(output);
+          } else {
+            return;
+          }
+
+          RdfWriter.write(config, writer);
+          output.flush();
+          job.setSuccess(true);
+        }
       }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      freeZipKey(zipKey);
     }
-    freeZipKey(zipKey);
   }
 
-  public static void addTtlToZip(String zipKey, AddTriplesRequest config) throws IOException {
-
-    logger.info("Will add ttl to zip "+zipKey);
-
-    try (FileSystem fs = prepareZip(zipKey, config.getPath())) {
-      Path nf = fs.getPath(config.getPath());
-      try (OutputStream out = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-        RdfWriter.writeTtl(config, out);
-      }
-    }
-    freeZipKey(zipKey);
-  }
 
   public static InputStream readFromZip(InputStream input, String path) throws IOException {
     ZipInputStream zipStream = new ZipInputStream(input);
@@ -122,19 +131,28 @@ public class ZipWriter {
     return fs;
   }
 
-  public static void streamDownload(String zipKey, OutputStream stream) throws IOException {
+  public static void streamDownload(String zipKey, OutputStream stream) {
     File file = requestAccess(zipKey);
-    Files.copy(file.toPath(), stream);
-    stream.flush();
+    try {
+      Files.copy(file.toPath(), stream);
+      stream.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     freeZipKey(zipKey);
   }
 
-  public static WeaverFile streamDownload(String zipKey, Weaver weaver) throws IOException {
+  public static void streamDownload(String zipKey, Weaver weaver, JobReport job) {
     File file = requestAccess(zipKey);
-    FileInputStream input = new FileInputStream(file);
-    WeaverFile weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
+    try {
+      FileInputStream input = new FileInputStream(file);
+      WeaverFile weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
+      job.setFileId(weaverFile.getId());
+      job.setSuccess(true);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
     freeZipKey(zipKey);
-    return weaverFile;
   }
 
   public static void wipe(String zipKey) {

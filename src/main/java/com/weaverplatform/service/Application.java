@@ -40,24 +40,22 @@ public class Application {
     // Route registration and mapping
     get("/",                    ApplicationController.about);
 
-    get("/containerToStore",    StoreController.containerToStore);
-    get("/fileFromStore",       StoreController.fileFromStore);
-
-    post("/addFile",            ContainerController.addFile);
-
-    post("/addRdf",             AddTriplesController.addXml);
-    post("/addTtl",             AddTriplesController.addTtl);
-
-    post("/extractRdf",         ExtractTriplesController.addXml);
-    post("/extractTtl",         ExtractTriplesController.addTtl);
-
-    post("/addRdfFromSnapshot", SnapshotRdfController.addXml);
-    post("/addTtlFromSnapshot", SnapshotRdfController.addTtl);
-
-    get("/download",            ContainerController.download);
+    get("/status",              JobController.getJob);
 
     get("/resetLocks",          ContainerController.resetLocks);
     get("/wipe",                ContainerController.wipe);
+    get("/download",            ContainerController.download);
+
+    get("/containerToStore",    StoreController.containerToStore);  // Spins off and returns job
+    get("/fileFromStore",       StoreController.fileFromStore);     // Spins off and returns job
+
+    post("/addFile",            ContainerController.addFile);       // Spins off and returns job
+
+    post("/addRdf",             AddTriplesController.add);          // Spins off and returns job
+
+    post("/addRdfFromSnapshot", SnapshotRdfController.add);         // Spins off and returns job
+
+    post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job
 
     get("/swagger", new Route() {
       @Override

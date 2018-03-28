@@ -29,6 +29,9 @@ public class ExtractTriplesRequest {
   private String toGraph;
 
   @Expose
+  private String rdfFormat;
+
+  @Expose
   private String path;
 
 
@@ -57,6 +60,14 @@ public class ExtractTriplesRequest {
 
   public String getToGraph() {
     return toGraph;
+  }
+
+  public void setRdfFormat(String rdfFormat) {
+    this.rdfFormat = rdfFormat;
+  }
+
+  public String getRdfFormat() {
+    return rdfFormat;
   }
 
   public void setPath(String path) {

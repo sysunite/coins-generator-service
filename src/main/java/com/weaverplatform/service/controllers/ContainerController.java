@@ -4,7 +4,7 @@ package com.weaverplatform.service.controllers;
 import com.google.gson.Gson;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.FileFromMultipartRequest;
-import com.weaverplatform.service.payloads.Success;
+import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.ZipWriter;
 import spark.Request;
 import spark.Response;
@@ -20,54 +20,43 @@ public class ContainerController {
 
   public static Route resetLocks = (Request request, Response response) -> {
     ZipWriter.resetBlockList();
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+    return new JobReport(true).toString(response);
   };
 
   public static Route addFile = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     AddFileRequest config;
     try {
       config = FileFromMultipartRequest.from(request);
     } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Problem parsing config json in multi-part"));
+      return new JobReport(false, "Problem parsing config json in multi-part").toString(response);
     }
 
-    try {
-      ZipWriter.addToZip(zipKey, config);
-
-    } catch(IOException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Could not write file to "+zipKey+""));
-    } catch(RuntimeException e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "" + e.getMessage() + ""));
-    }
-
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        try {
+          ZipWriter.addToZip(zipKey, config);
+          job.setSuccess(true);
+        } catch (IOException e) {
+          job.setMessage(e.getMessage());
+          job.setSuccess(false);
+        }
+      }
+    }.start();
+    return job.toString(response);
   };
 
   public static Route download = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     // Read the resulting file
@@ -75,9 +64,7 @@ public class ContainerController {
     try (OutputStream stream = raw.getOutputStream()) {
       ZipWriter.streamDownload(zipKey, stream);
     } catch(Exception e) {
-      response.status(500);
-      response.body();
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
+      return new JobReport(false, ""+e.getMessage()+"").toString(response);
     }
 
     response.raw().setContentType("application/octet-stream");
@@ -89,22 +76,16 @@ public class ContainerController {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
     if(zipKey == null) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, "Please provide zipKey"));
+      return new JobReport(false, "Please provide zipKey").toString(response);
     }
 
     try {
       ZipWriter.wipe(zipKey);
     } catch(Exception e) {
-      response.status(500);
-      response.type("application/json");
-      return gson.toJson(new Success(false, ""+e.getMessage()+""));
+      return new JobReport(false, ""+e.getMessage()+"").toString(response);
     }
 
-    response.status(200);
-    response.type("application/json");
-    return "{\"success\":true}";
+    return new JobReport(true).toString(response);
   };
 
 }

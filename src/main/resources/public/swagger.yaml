@@ -24,6 +24,7 @@ paths:
           description: succes
           schema:
             type: string
+
   /swagger:
     get:
       summary: Swagger definition of the service
@@ -37,10 +38,28 @@ paths:
         '200':
           description: succes
 
+  /status:
+    get:
+      summary: Job status
+      description: >-
+        Returns the status of a previously executed Job
+      operationId: getStatus
+      parameters:
+        - in: query
+          name: jobId
+          required: true
+          type: string
+          description: the id of the job
+      produces:
+        - application/yaml
+      responses:
+        '200':
+          description: succes
+
   /addRdf:
     post:
       description: >-
-        Create an rdf/xml file in the container
+        Create an rdf file in the container
       operationId: addRdf
       consumes:
         - multipart/form-data
@@ -53,32 +72,9 @@ paths:
         - in: formData
           name: config
           type: string
-          description: config json (fields are path, prefixMap, defaultPrefix, mainContext, reify)
-        - in: formData
-          name: payload
-          type: file
-          description: write operations json file
-      responses:
-        '200':
-          description: succes
-
-  /addTtl:
-    post:
-      description: >-
-        Create an turtle file in the container
-      operationId: addTtl
-      consumes:
-        - multipart/form-data
-      parameters:
-        - in: query
-          name: zipKey
-          required: true
-          type: string
-          description: some id of the container
-        - in: formData
-          name: config
-          type: string
-          description: config json (fields are path, prefixMap, defaultPrefix, mainContext, reify)
+          description: >-
+            config json (fields are rdfFormat, path, prefixMap, defaultPrefix, mainContext, reify)
+            supported types for rdfFormat are 'RDF/XML' and 'Turtle'
         - in: formData
           name: payload
           type: file
@@ -90,7 +86,7 @@ paths:
   /extractRdf:
     post:
       description: >-
-        Create an rdf/xml file in the container
+        Create an rdf file in the container
       operationId: extractRdf
       consumes:
         - multipart/form-data
@@ -108,39 +104,9 @@ paths:
         - in: formData
           name: config
           type: string
-          description: config json (fields are path, prefixMap, toGraph)
-        - in: formData
-          name: payload
-          type: file
-          description: write operations json file
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: succes
-
-  /extractTtl:
-    post:
-      description: >-
-        Create gzipped write operations json based on file in
-      operationId: extractTtl
-      consumes:
-        - multipart/form-data
-      parameters:
-        - in: query
-          name: project
-          required: true
-          type: string
-          description: the id of the project
-        - in: query
-          name: user
-          required: true
-          type: string
-          description: the authtoken of the user calling the service
-        - in: formData
-          name: config
-          type: string
-          description: config json (fields are path, prefixMap, toGraph)
+          description: >-
+            config json (fields are rdfFormat, path, prefixMap, toGraph)
+            supported types for rdfFormat are 'RDF/XML' and 'Turtle'
         - in: formData
           name: payload
           type: file
@@ -154,7 +120,7 @@ paths:
   /addRdfFromSnapshot:
     post:
       description: >-
-        Create an rdf/xml file in the container
+        Create an rdf file in the container
       operationId: addRdfFromSnapshot
       parameters:
         - in: query
@@ -184,45 +150,9 @@ paths:
           required: true
           schema:
             type: string
-          description: config json (fields are path, prefixMap, defaultPrefix, mainContext, reify)
-      responses:
-        '200':
-          description: succes
-
-  /addTtlFromSnapshot:
-    post:
-      description: >-
-        Create an turtle file in the container
-      operationId: addTtlFromSnapshot
-      parameters:
-        - in: query
-          name: project
-          required: true
-          type: string
-          description: the id of the project
-        - in: query
-          name: user
-          required: true
-          type: string
-          description: the authtoken of the user calling the service
-        - in: query
-          name: zipKey
-          required: true
-          type: string
-          description: some id of the container
-        - in: query
-          name: graphs
-          required: true
-          type: array
-          items:
-            type: string
-          description: the graphs to pull from the connector (null for default graph)
-        - in: body
-          name: config
-          required: true
-          schema:
-            type: string
-          description: config json (fields are path, prefixMap, defaultPrefix, mainContext, reify)
+          description: >-
+            config json (fields are rdfFormat, path, prefixMap, defaultPrefix, mainContext, reify)
+            supported types for rdfFormat are 'RDF/XML' and 'Turtle'
       responses:
         '200':
           description: succes
@@ -337,7 +267,6 @@ paths:
       responses:
         '200':
           description: succes
-
 
   /wipe:
     get:

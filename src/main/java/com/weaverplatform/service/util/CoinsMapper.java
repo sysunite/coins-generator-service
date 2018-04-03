@@ -91,7 +91,7 @@ public class CoinsMapper {
     }
     for(String prefix : uris.keySet()) {
       if(abbreviated.startsWith(prefix + ":")) {
-        if(abbreviated.split(":").length == 1) {
+        if(abbreviated.split(":").length < 2) {
           return uris.get(prefix);
         } else {
           return uris.get(prefix) + abbreviated.split(":")[1];

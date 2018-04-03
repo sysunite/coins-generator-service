@@ -88,8 +88,6 @@ paths:
       description: >-
         Create an rdf file in the container
       operationId: extractRdf
-      consumes:
-        - multipart/form-data
       parameters:
         - in: query
           name: project
@@ -101,16 +99,19 @@ paths:
           required: true
           type: string
           description: the authtoken of the user calling the service
-        - in: formData
-          name: config
+        - in: query
+          name: fileId
+          required: true
           type: string
+          description: the id of the file in the store
+        - in: body
+          name: config
+          required: true
+          schema:
+            type: string
           description: >-
             config json (fields are rdfFormat, path, prefixMap, toGraph)
             supported types for rdfFormat are 'RDF/XML' and 'Turtle'
-        - in: formData
-          name: payload
-          type: file
-          description: write operations json file
       produces:
         - application/json
       responses:

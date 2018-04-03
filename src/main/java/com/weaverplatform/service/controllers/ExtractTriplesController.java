@@ -29,11 +29,17 @@ public class ExtractTriplesController {
       return new JobReport(false, "Please provide authToken").toString(response);
     }
 
+    String fileId = request.queryParamOrDefault("fileId", null);
+    if(fileId == null) {
+      return new JobReport(false, "Please provide fileId").toString(response);
+    }
+
     ExtractTriplesRequest config;
     try {
-      config = ExtractTriplesRequest.fromMultipart(request);
+      config = ExtractTriplesRequest.fromBody(request);
+      config.setFileId(fileId);
     } catch(Exception e) {
-      return new JobReport(false, "Problem parsing config json in multi-part").toString(response);
+      return new JobReport(false, "Problem parsing config json in body: "+request.body()).toString(response);
     }
 
     Weaver weaver;

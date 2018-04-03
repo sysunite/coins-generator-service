@@ -18,8 +18,6 @@ import org.eclipse.rdf4j.rio.turtle.TurtleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -106,8 +104,18 @@ public class WriteOperationsExtractor {
         total += items.size();
         job.setProgress(total);
 
-        JsonElement element = gson.toJsonTree(items, new TypeToken<List<SuperOperation>>() {
-        }.getType());
+        JsonElement element = gson.toJsonTree(items, new TypeToken<List<SuperOperation>>() {}.getType());
+        
+//        try {
+//          File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json");
+//          file.getParentFile().mkdirs();
+//          FileWriter fileWriter = new FileWriter(file);
+//          fileWriter.write(gson.toJson(element.getAsJsonArray()));
+//          fileWriter.flush();
+//          fileWriter.close();
+//        } catch (IOException e) {
+//          e.printStackTrace();
+//        }
 
         weaver.reallySendCreate(element.getAsJsonArray(), false);
       }

@@ -47,7 +47,7 @@ public class FileFromMultipartRequest implements AddFileRequest {
     Part config = request.raw().getPart("config");
 
     Reader reader = new InputStreamReader(config.getInputStream(), "UTF-8");
-    FileFromMultipartRequest result  = new Gson().fromJson(reader, FileFromMultipartRequest.class);
+    FileFromMultipartRequest result = new Gson().fromJson(reader, FileFromMultipartRequest.class);
     result.setFile(file.getInputStream());
     return result;
   }

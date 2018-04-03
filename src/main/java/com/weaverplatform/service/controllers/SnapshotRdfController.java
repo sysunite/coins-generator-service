@@ -72,21 +72,14 @@ public class SnapshotRdfController {
         throw new RuntimeException();
       }
     } catch(Exception e) {
-      return new JobReport(false, "Problem parsing config json in body").toString(response);
+      return new JobReport(false, "Problem parsing config json in body: "+request.body()).toString(response);
     }
 
     try {
-      for(String graph : graphs) {
-        if(graph == null) {
-          logger.info("Graph is null");
-        } else {
-          logger.info("Graph is '"+graph+"'");
-        }
-        DownloadedPart part = new DownloadedPart();
-        InputStream zippedStream = weaver.getSnapshotGraph(graph, true);
-        part.writeZippedStream(zippedStream);
-        config.addPayload(part);
-      }
+      DownloadedPart part = new DownloadedPart();
+      InputStream zippedStream = weaver.getSnapshotGraph(graphs, null, null,true);
+      part.writeZippedStream(zippedStream);
+      config.addPayload(part);
     } catch(Exception e) {
       return new JobReport(false, "Problem retrieving write operations: "+e.getMessage()+"").toString(response);
     }

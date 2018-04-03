@@ -114,14 +114,17 @@ public class WriteOperationsModel extends RdfModel {
     return !hasNext();
   }
 
-  public ArrayList<WriteOperation> next(int size) {
+  public ArrayList<SuperOperation> next(int size) {
 
-    ArrayList<WriteOperation> list = new ArrayList<>();
+    ArrayList<SuperOperation> list = new ArrayList<>();
 
     while(list.size() < size && !nodeItems.isEmpty()) {
       Item nodeItem = nodeItems.remove(0);
       if(filterRestriction(nodeItem)) {
-        CreateNodeOperation operation = new CreateNodeOperation(user, nodeItem.original);
+        SuperOperation operation = new SuperOperation();
+        operation.setAction("create-node");
+        operation.setId(nodeItem.original);
+        operation.setUser(user);
         operation.setGraph(nodeItem.graphId);
         list.add(operation);
       }
@@ -132,9 +135,16 @@ public class WriteOperationsModel extends RdfModel {
       if(filterRestriction(item.sourceId)) {
         Object value = getValue(item.literal);
         AttributeDataType dataType = getDataType(item.literal);
-        CreateAttributeOperation operation = new CreateAttributeOperation(user, Cuid.createCuid(), item.sourceId.original, item.key.original, value, dataType);
+        SuperOperation operation = new SuperOperation();
+        operation.setAction("create-attribute");
+        operation.setId(Cuid.createCuid());
         operation.setGraph(item.sourceId.graphId);
+        operation.setUser(user);
+        operation.setSourceId(item.sourceId.original);
         operation.setSourceGraph(item.sourceId.graphId);
+        operation.setKey(item.key.original);
+        operation.setValue(value);
+        operation.setDatatype(dataType);
         list.add(operation);
       }
     }
@@ -142,9 +152,15 @@ public class WriteOperationsModel extends RdfModel {
     while(list.size() < size && !relationItems.isEmpty()) {
       RelationItem item = relationItems.remove(0);
       if(filterRestriction(item.sourceId) && filterRestriction(item.toId)) {
-        CreateRelationOperation operation = new CreateRelationOperation(user, Cuid.createCuid(), item.sourceId.original, item.key.original, item.toId.original);
+        SuperOperation operation = new SuperOperation();
+        operation.setAction("create-relation");
+        operation.setUser(user);
+        operation.setId(Cuid.createCuid());
         operation.setGraph(item.sourceId.graphId);
+        operation.setSourceId(item.sourceId.original);
         operation.setSourceGraph(item.sourceId.graphId);
+        operation.setKey(item.key.original);
+        operation.setTargetId(item.toId.original);
         operation.setTargetGraph(item.toId.graphId);
         list.add(operation);
       }

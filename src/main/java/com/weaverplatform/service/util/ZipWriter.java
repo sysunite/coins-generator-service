@@ -60,7 +60,6 @@ public class ZipWriter {
         Path nf = fs.getPath(config.getPath());
         try (OutputStream output = Files.newOutputStream(nf, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
 
-
           RDFWriter writer;
           if("turtle".equals(config.getRdfFormat().toLowerCase())) {
             writer = new TurtleWriter(output);
@@ -89,7 +88,7 @@ public class ZipWriter {
       ZipEntry entry = zipStream.getNextEntry();
 
       if (entry.getName().equals(path)) {
-        logger.info("Found entry with name " + path);
+        logger.info("Found entry with name " + path + " with size: "+entry.getSize());
         return zipStream;
       }
     }

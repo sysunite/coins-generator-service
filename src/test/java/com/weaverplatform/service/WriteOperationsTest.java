@@ -3,7 +3,7 @@ package com.weaverplatform.service;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.weaverplatform.Resource;
-import com.weaverplatform.protocol.model.WriteOperation;
+import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.service.util.WriteOperationsModel;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;
@@ -56,11 +56,11 @@ public class WriteOperationsTest  {
       int total = 0;
       while(model.hasNext()) {
 
-        List<WriteOperation> items = model.next(1);
+        List<SuperOperation> items = model.next(1);
         if(items.isEmpty()) {
           continue;
         }
-        WriteOperation item = items.get(0);
+        SuperOperation item = items.get(0);
         total++;
         Gson gson = new Gson();
         gson.toJson(item, item.getClass(), writer);

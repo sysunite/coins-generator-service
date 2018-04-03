@@ -105,7 +105,7 @@ public class WriteOperationsExtractor {
         job.setProgress(total);
 
         JsonElement element = gson.toJsonTree(items, new TypeToken<List<SuperOperation>>() {}.getType());
-        
+
 //        try {
 //          File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json");
 //          file.getParentFile().mkdirs();

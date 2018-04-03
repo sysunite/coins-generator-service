@@ -96,6 +96,7 @@ public class SnapshotRdfController {
       return new JobReport(false, "Please set rdfFormat to either 'turtle' or 'rdf/xml'").toString(response);
     }
 
+    logger.info("Starting thread to add rdf from snapshot to container "+zipKey);
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {

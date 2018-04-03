@@ -5,6 +5,8 @@ import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
 import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.WriteOperationsExtractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -12,6 +14,8 @@ import spark.Route;
 import static com.weaverplatform.service.controllers.StoreController.getWeaver;
 
 public class ExtractTriplesController {
+
+  private static Logger logger = LoggerFactory.getLogger(ExtractTriplesController.class);
 
   public static Route extract = (Request request, Response response) -> {
 
@@ -39,6 +43,7 @@ public class ExtractTriplesController {
       return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"");
     }
 
+    logger.info("Starting thread to import a container");
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {

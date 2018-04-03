@@ -6,6 +6,8 @@ import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.FileFromMultipartRequest;
 import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.ZipWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ContainerController {
+
+  private static Logger logger = LoggerFactory.getLogger(ContainerController.class);
 
   public static Gson gson = new Gson();
 
@@ -37,6 +41,7 @@ public class ContainerController {
       return new JobReport(false, "Problem parsing config json in multi-part").toString(response);
     }
 
+    logger.info("Starting thread to add file to container "+zipKey);
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {

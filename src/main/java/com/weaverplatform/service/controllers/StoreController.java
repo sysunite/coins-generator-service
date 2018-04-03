@@ -84,7 +84,7 @@ public class StoreController {
     }
 
 
-
+    logger.info("Starting thread to stream a file from storage with container "+zipKey);
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {
@@ -129,7 +129,7 @@ public class StoreController {
       return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
     }
 
-
+    logger.info("Starting thread to stream a file to storage with container "+zipKey);
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {

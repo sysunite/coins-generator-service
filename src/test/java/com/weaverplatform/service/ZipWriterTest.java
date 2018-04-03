@@ -1,14 +1,10 @@
 package com.weaverplatform.service;
 
-import com.weaverplatform.service.payloads.AddFileRequest;
-import com.weaverplatform.service.payloads.AddTriplesRequest;
-import com.weaverplatform.service.payloads.ExtractTriplesRequest;
-import com.weaverplatform.service.payloads.FileFromMultipartRequest;
-import com.weaverplatform.service.util.WriteOperationsExtractor;
+import com.weaverplatform.service.payloads.*;
 import com.weaverplatform.service.util.ZipWriter;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
+import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -66,7 +62,8 @@ public class ZipWriterTest {
     config.setPrefixMap(prefixMap);
     config.setPath("bim/otl.rdf");
 
-    ZipWriter.addXmlToZip(zipKey, config);
+    JobReport job = new JobReport();
+    ZipWriter.addRdfToZip(zipKey, config, job);
   }
 
   @Test
@@ -123,11 +120,8 @@ public class ZipWriterTest {
     config.setPrefixMap(prefixMap);
     config.setPath("bim/content.ttl");
 
-    try {
-      ZipWriter.addTtlToZip(zipKey, config);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    JobReport job = new JobReport();
+    ZipWriter.addRdfToZip(zipKey, config, job);
   }
 
   @Test
@@ -154,11 +148,8 @@ public class ZipWriterTest {
     config.setPrefixMap(prefixMap);
     config.setPath("Payload triples/Content.ttl");
 
-    try {
-      ZipWriter.addTtlToZip(zipKey, config);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    JobReport job = new JobReport();
+    ZipWriter.addRdfToZip(zipKey, config, job);
   }
 
 
@@ -172,6 +163,11 @@ public class ZipWriterTest {
     ZipWriter.addToZip(zipKey, config);
   }
 
+  @Test
+  public void zipSize() throws IOException {
+    Part part = new PartMock("abc.ccr");
+    ZipWriter.readFromZip(part.getInputStream(), "bim/otl.rdf");
+  }
 
   @Test
   public void extractRdf() throws IOException {
@@ -217,11 +213,11 @@ public class ZipWriterTest {
     prefixMap.put("", "http://dataroom/#");
 
     ExtractTriplesRequest config = new ExtractTriplesRequest();
-    config.addPayload(new PartMock("abc.ccr"));
+//    config.addPayload(new PartMock("abc.ccr"));
     config.setToGraph("aaa");
     config.setPrefixMap(prefixMap);
     config.setPath("bim/otl.rdf");
 
-    WriteOperationsExtractor.writeOperationsXml(new FileOutputStream("/tmp/write-ops.json"), config);
+//    WriteOperationsExtractor.writeOperationsXml(new FileOutputStream("/tmp/write-ops.json"), config);
   }
 }

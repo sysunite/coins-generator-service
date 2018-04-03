@@ -55,7 +55,7 @@ public class Application {
 
     post("/addRdfFromSnapshot", SnapshotRdfController.add);         // Spins off and returns job
 
-    post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job
+    post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job  - progress enabled
 
     get("/swagger", new Route() {
       @Override

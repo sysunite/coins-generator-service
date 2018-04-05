@@ -214,7 +214,7 @@ public class ZipWriterTest {
 
     ExtractTriplesRequest config = new ExtractTriplesRequest();
 //    config.addPayload(new PartMock("abc.ccr"));
-    config.setToGraph("aaa");
+    config.setDefaultGraph("aaa");
     config.setPrefixMap(prefixMap);
     config.setPath("bim/otl.rdf");
 

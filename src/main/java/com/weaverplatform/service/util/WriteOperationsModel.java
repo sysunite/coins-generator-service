@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -33,6 +34,14 @@ public class WriteOperationsModel extends RdfModel {
 
   public void setGraph(String graph) {
     this.defaultGraph = graph;
+  }
+
+  public void setGraphMap(HashMap<String, String> map) {
+    this.graphMap = map;
+  }
+
+  public void setDismissGraphs(HashSet<String> dismissGraphs) {
+    this.dismissGraphs = dismissGraphs;
   }
 
 
@@ -114,16 +123,20 @@ public class WriteOperationsModel extends RdfModel {
     return !hasNext();
   }
 
+  private boolean storeThisGraph(String graphId) {
+   return (dismissGraphs == null || !dismissGraphs.contains(graphId));
+  }
+
   public ArrayList<SuperOperation> next(int size) {
 
     ArrayList<SuperOperation> list = new ArrayList<>();
 
     while(list.size() < size && !nodeItems.isEmpty()) {
       Item nodeItem = nodeItems.remove(0);
-      if(filterRestriction(nodeItem)) {
+      if(filterRestriction(nodeItem) && storeThisGraph(nodeItem.graphId)) {
         SuperOperation operation = new SuperOperation();
         operation.setAction("create-node");
-        operation.setId(nodeItem.original);
+        operation.setId(nodeItem.finalId);
         operation.setUser(user);
         operation.setGraph(nodeItem.graphId);
         list.add(operation);
@@ -132,7 +145,7 @@ public class WriteOperationsModel extends RdfModel {
 
     while(list.size() < size && !attributeItems.isEmpty()) {
       AttributeItem item = attributeItems.remove(0);
-      if(filterRestriction(item.sourceId)) {
+      if(filterRestriction(item.sourceId) && storeThisGraph(item.sourceId.graphId)) {
         Object value = getValue(item.literal);
         AttributeDataType dataType = getDataType(item.literal);
         SuperOperation operation = new SuperOperation();
@@ -140,9 +153,9 @@ public class WriteOperationsModel extends RdfModel {
         operation.setId(Cuid.createCuid());
         operation.setGraph(item.sourceId.graphId);
         operation.setUser(user);
-        operation.setSourceId(item.sourceId.original);
+        operation.setSourceId(item.sourceId.finalId);
         operation.setSourceGraph(item.sourceId.graphId);
-        operation.setKey(item.key.original);
+        operation.setKey(item.key.finalId);
         operation.setValue(value);
         operation.setDatatype(dataType);
         list.add(operation);
@@ -151,16 +164,16 @@ public class WriteOperationsModel extends RdfModel {
 
     while(list.size() < size && !relationItems.isEmpty()) {
       RelationItem item = relationItems.remove(0);
-      if(filterRestriction(item.sourceId) && filterRestriction(item.toId)) {
+      if(filterRestriction(item.sourceId) && filterRestriction(item.toId) && storeThisGraph(item.sourceId.graphId)) {
         SuperOperation operation = new SuperOperation();
         operation.setAction("create-relation");
         operation.setUser(user);
         operation.setId(Cuid.createCuid());
         operation.setGraph(item.sourceId.graphId);
-        operation.setSourceId(item.sourceId.original);
+        operation.setSourceId(item.sourceId.finalId);
         operation.setSourceGraph(item.sourceId.graphId);
-        operation.setKey(item.key.original);
-        operation.setTargetId(item.toId.original);
+        operation.setKey(item.key.finalId);
+        operation.setTargetId(item.toId.finalId);
         operation.setTargetGraph(item.toId.graphId);
         list.add(operation);
       }

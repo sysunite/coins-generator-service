@@ -7,6 +7,7 @@ import spark.Request;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author bastbijl, Sysunite 2018
@@ -17,7 +18,13 @@ public class ExtractTriplesRequest {
   private HashMap<String, String> prefixMap;
 
   @Expose
-  private String toGraph;
+  private HashMap<String, String> graphMap;
+
+  @Expose
+  private String defaultGraph;
+
+  @Expose
+  private HashSet<String> dismissGraphs;
 
   @Expose
   private String rdfFormat;
@@ -37,12 +44,28 @@ public class ExtractTriplesRequest {
     return prefixMap;
   }
 
-  public void setToGraph(String toGraph) {
-    this.toGraph = toGraph;
+  public void setGraphMap(HashMap<String, String> graphMap) {
+    this.graphMap = graphMap;
   }
 
-  public String getToGraph() {
-    return toGraph;
+  public HashMap<String, String> getGraphMap() {
+    return graphMap;
+  }
+
+  public void setDefaultGraph(String defaultGraph) {
+    this.defaultGraph = defaultGraph;
+  }
+
+  public String getDefaultGraph() {
+    return defaultGraph;
+  }
+
+  public void setDismissGraphs(HashSet<String> dismissGraphs) {
+    this.dismissGraphs = dismissGraphs;
+  }
+
+  public HashSet<String> getDismissGraphs() {
+    return dismissGraphs;
   }
 
   public void setRdfFormat(String rdfFormat) {

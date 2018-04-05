@@ -70,6 +70,8 @@ public abstract class RdfModel implements Model {
 
   protected String currentPrefix = null;
   protected String defaultGraph = null;
+  protected HashMap<String, String>  graphMap = null;
+  protected HashSet<String>  dismissGraphs = null;
 
   protected final HashMap<String, Item> items = new HashMap<>();
 
@@ -183,13 +185,21 @@ public abstract class RdfModel implements Model {
     return result;
   }
 
+  public String getGraphForId(String abbreviated) {
+    if(abbreviated.indexOf(":") > -1) {
+      String prefix = abbreviated.substring(0, abbreviated.indexOf(":"));
+      if(graphMap != null && graphMap.containsKey(prefix)) {
+        return graphMap.get(prefix);
+      }
+    }
+    return defaultGraph;
+  }
 
   public Item getItem(String finalId) {
     if(items.containsKey(finalId)) {
       return items.get(finalId);
     }
-
-    Item item = new Item(finalId, defaultGraph);
+    Item item = new Item(finalId, getGraphForId(finalId));
     items.put(finalId, item);
     return item;
   }
@@ -212,13 +222,13 @@ public abstract class RdfModel implements Model {
     if(item.label != null) {
       return camelCase(item.label.stringValue());
     }
-    if(ModelDefinition.illegalName(item.original)) {
+    if(ModelDefinition.illegalName(item.finalId)) {
       if(item.backupId == null) {
         item.backupId = "n" + Math.abs(item.hashCode());
       }
       return item.backupId;
     }
-    return item.original;
+    return item.finalId;
   }
 
   @Override
@@ -493,7 +503,7 @@ public abstract class RdfModel implements Model {
   }
 
   class Item {
-    public String original; // todo: rename to finalId
+    public String finalId;
     public Literal label;
     public String backupId;
     public String graphId;
@@ -510,12 +520,12 @@ public abstract class RdfModel implements Model {
     }
 
     public Item(String finalId, String graphId) {
-      this.original = finalId;
+      this.finalId = finalId;
       this.graphId = graphId;
     }
     @Override
     public int hashCode() {
-      return original.hashCode();
+      return finalId.hashCode();
     }
   }
   class AttributeItem {

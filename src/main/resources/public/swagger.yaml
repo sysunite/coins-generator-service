@@ -110,7 +110,7 @@ paths:
           schema:
             type: string
           description: >-
-            config json (fields are rdfFormat, path, prefixMap, toGraph)
+            config json (fields are rdfFormat, path, prefixMap, graphMap, defaultGraph, dismissGraphs)
             supported types for rdfFormat are 'RDF/XML' and 'Turtle'
       produces:
         - application/json

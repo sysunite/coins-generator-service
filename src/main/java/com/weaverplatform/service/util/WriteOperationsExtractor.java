@@ -67,7 +67,9 @@ public class WriteOperationsExtractor {
 
     model.setFilterRestrictions(false);
     model.setFilterPreferredLanguage(true);
-    model.setGraph(config.getToGraph());
+    model.setGraph(config.getDefaultGraph());
+    model.setGraphMap(config.getGraphMap());
+    model.setDismissGraphs(config.getDismissGraphs());
 
     InputStream fileStream = null;
     try {

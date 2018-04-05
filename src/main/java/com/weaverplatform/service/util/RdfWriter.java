@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -56,6 +57,12 @@ public class RdfWriter {
     }
     writer.startRDF();
 
+
+    HashSet<String> dismissKeys = config.getDismissKeys();
+    if(dismissKeys == null) {
+      dismissKeys = new HashSet<>();
+    }
+
     for(Character filterChar : filterChars) {
 
       for(Part part : config.getPayloads()) {
@@ -73,10 +80,14 @@ public class RdfWriter {
             }
 
             for (SuperOperation operation : operations) {
+              if (operation.getKey() == null || dismissKeys.contains(operation.getKey())) {
+                continue;
+              }
               for(Statement statement : mapper.map(operation)) {
-                if (statement != null) {
-                  writer.handleStatement(statement);
+                if (statement == null) {
+                  continue;
                 }
+                writer.handleStatement(statement);
               }
             }
 

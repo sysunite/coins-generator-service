@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -24,6 +25,9 @@ public class AddTriplesRequest {
 
   @Expose
   private HashMap<String, String> prefixMap;
+
+  @Expose
+  private HashSet<String> dismissKeys;
 
   @Expose
   private String defaultPrefix;
@@ -58,6 +62,14 @@ public class AddTriplesRequest {
 
   public HashMap<String, String> getPrefixMap() {
     return prefixMap;
+  }
+
+  public void setDismissKeys(HashSet<String> dismissKeys) {
+    this.dismissKeys = dismissKeys;
+  }
+
+  public HashSet<String> getDismissKeys() {
+    return dismissKeys;
   }
 
   public void setDefaultPrefix(String defaultPrefix) {

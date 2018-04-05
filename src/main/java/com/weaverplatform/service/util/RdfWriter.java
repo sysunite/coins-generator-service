@@ -1,6 +1,5 @@
 package com.weaverplatform.service.util;
 
-import com.weaverplatform.protocol.SortedWriteOperationParser;
 import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
@@ -14,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static com.weaverplatform.service.util.SortUtil.charComparator;
 
 /**
  * @author bastbijl, Sysunite 2018
@@ -34,7 +35,7 @@ public class RdfWriter {
       writer.handleNamespace(prefix, config.getPrefixMap().get(prefix));
     }
 
-    Set<Character> filterChars = new TreeSet<>();
+    Set<Character> filterChars = new TreeSet<>(charComparator);
     for(Part part : config.getPayloads()) {
       try (InputStream inputStream = part.getInputStream()) {
         for(char ch : SortedWriteOperationParser.startChars(inputStream)) {

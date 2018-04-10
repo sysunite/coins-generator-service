@@ -18,6 +18,8 @@ import org.eclipse.rdf4j.rio.turtle.TurtleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -30,7 +32,8 @@ public class WriteOperationsExtractor {
 
   static Logger logger = LoggerFactory.getLogger(Application.class);
 
-  public static final int WRITE_BATCH_SIZE = 5000;
+  final static int WRITE_BATCH_SIZE = Props.getInt("WRITE_BATCH_SIZE", "service.operations.chunksize");
+  final static Boolean LOG_WRITE_OPERATIONS = Props.getBoolean("LOG_WRITE_OPERATIONS", "service.operations.log");
 
   public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -108,16 +111,18 @@ public class WriteOperationsExtractor {
 
         JsonElement element = gson.toJsonTree(items, new TypeToken<List<SuperOperation>>() {}.getType());
 
-//        try {
-//          File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json");
-//          file.getParentFile().mkdirs();
-//          FileWriter fileWriter = new FileWriter(file);
-//          fileWriter.write(gson.toJson(element.getAsJsonArray()));
-//          fileWriter.flush();
-//          fileWriter.close();
-//        } catch (IOException e) {
-//          e.printStackTrace();
-//        }
+        if(LOG_WRITE_OPERATIONS) {
+          try {
+            File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json");
+            file.getParentFile().mkdirs();
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(gson.toJson(element.getAsJsonArray()));
+            fileWriter.flush();
+            fileWriter.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
 
         weaver.reallySendCreate(element.getAsJsonArray(), false);
       }

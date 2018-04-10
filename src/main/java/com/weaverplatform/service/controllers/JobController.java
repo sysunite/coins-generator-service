@@ -20,6 +20,7 @@ public class JobController {
   public static JobReport addJob() {
     JobReport job = new JobReport();
     jobMap.put(job.getJobId(), job);
+    logger.info("Job created with " + job.getJobId());
     return job;
   }
 

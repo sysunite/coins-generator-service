@@ -2,12 +2,16 @@ package com.weaverplatform.service.payloads;
 
 import com.google.gson.Gson;
 import com.weaverplatform.service.util.Cuid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Response;
 
 /**
  * @author bastbijl, Sysunite 2018
  */
 public class JobReport {
+
+  static Logger logger = LoggerFactory.getLogger(JobReport.class);
 
   public static Gson gson = new Gson();
 
@@ -28,7 +32,7 @@ public class JobReport {
 
   public JobReport(boolean success, String message) {
     this.success = success;
-    this.message = message;
+    setMessage(message);
   }
 
   public JobReport setSuccess(boolean success) {
@@ -38,6 +42,7 @@ public class JobReport {
 
   public JobReport setMessage(String message) {
     this.message = message;
+    logger.info("Set message on job: "+message);
     return this;
   }
 

@@ -57,12 +57,9 @@ public class Application {
 
     post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job  - progress enabled
 
-    get("/swagger", new Route() {
-      @Override
-      public Object handle(Request request, Response response) throws Exception {
-        response.redirect("/swagger.yaml");
-        return "no";
-      }
+    get("/swagger", (request, response) -> {
+      response.redirect("/swagger.yaml");
+      return "no";
     });
 
     // 404

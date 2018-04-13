@@ -86,7 +86,9 @@ public class CoinsMapper {
   }
 
   private String expand(String abbreviated) {
-    if(abbreviated.startsWith("http")) {
+    if(abbreviated.startsWith("http://") ||
+       abbreviated.startsWith("https://") ||
+       abbreviated.startsWith("file://")) {
       return abbreviated;
     }
     for(String prefix : uris.keySet()) {

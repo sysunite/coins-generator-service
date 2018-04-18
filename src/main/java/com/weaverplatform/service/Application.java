@@ -4,9 +4,6 @@ import com.weaverplatform.service.controllers.*;
 import com.weaverplatform.service.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
-import spark.Response;
-import spark.Route;
 
 import static spark.Spark.*;
 
@@ -56,6 +53,8 @@ public class Application {
     post("/addRdfFromSnapshot", SnapshotRdfController.add);         // Spins off and returns job
 
     post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job  - progress enabled
+
+    get("/containerContent",    ContainerController.listContent);
 
     get("/swagger", (request, response) -> {
       response.redirect("/swagger.yaml");

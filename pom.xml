@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sysunite</groupId>
   <artifactId>rdf-export-service</artifactId>
-  <version>1.4.1</version>
+  <version>1.5.0</version>
   <dependencies>
     <dependency>
       <groupId>org.eclipse.rdf4j</groupId>

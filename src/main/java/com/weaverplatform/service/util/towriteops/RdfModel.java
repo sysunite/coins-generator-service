@@ -1,8 +1,9 @@
-package com.weaverplatform.service.util;
+package com.weaverplatform.service.util.towriteops;
 
 import com.weaverplatform.protocol.model.AttributeDataType;
 import com.weaverplatform.protocol.model.PrimitiveDataType;
 import com.weaverplatform.protocol.weavermodel.ModelDefinition;
+import com.weaverplatform.service.util.Cuid;
 import com.weaverplatform.util.DataTypeUtil;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;

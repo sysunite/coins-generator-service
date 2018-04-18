@@ -4,7 +4,7 @@ package com.weaverplatform.service.controllers;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
 import com.weaverplatform.service.payloads.JobReport;
-import com.weaverplatform.service.util.WriteOperationsExtractor;
+import com.weaverplatform.service.util.towriteops.WriteOperationsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;

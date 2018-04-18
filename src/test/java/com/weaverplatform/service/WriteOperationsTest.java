@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.weaverplatform.Resource;
 import com.weaverplatform.protocol.model.SuperOperation;
-import com.weaverplatform.service.util.WriteOperationsModel;
+import com.weaverplatform.service.util.towriteops.WriteOperationsModel;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;
 import org.eclipse.rdf4j.rio.turtle.TurtleParser;

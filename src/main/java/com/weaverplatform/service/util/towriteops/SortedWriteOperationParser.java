@@ -1,4 +1,4 @@
-package com.weaverplatform.service.util;
+package com.weaverplatform.service.util.towriteops;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

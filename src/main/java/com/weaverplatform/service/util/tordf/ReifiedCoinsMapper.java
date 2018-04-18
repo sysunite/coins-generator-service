@@ -1,4 +1,4 @@
-package com.weaverplatform.service.util;
+package com.weaverplatform.service.util.tordf;
 
 import com.weaverplatform.protocol.model.SuperOperation;
 import org.eclipse.rdf4j.model.IRI;

@@ -7,6 +7,7 @@ import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import com.weaverplatform.service.payloads.AddFileRequest;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
 import com.weaverplatform.service.payloads.JobReport;
+import com.weaverplatform.service.util.tordf.RdfWriter;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
 import org.slf4j.Logger;

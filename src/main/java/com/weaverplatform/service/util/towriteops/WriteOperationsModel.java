@@ -1,6 +1,7 @@
-package com.weaverplatform.service.util;
+package com.weaverplatform.service.util.towriteops;
 
 import com.weaverplatform.protocol.model.*;
+import com.weaverplatform.service.util.Cuid;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.vocabulary.RDF;

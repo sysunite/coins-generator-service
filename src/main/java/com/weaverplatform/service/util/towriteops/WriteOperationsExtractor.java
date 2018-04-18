@@ -1,4 +1,4 @@
-package com.weaverplatform.service.util;
+package com.weaverplatform.service.util.towriteops;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,6 +10,8 @@ import com.weaverplatform.service.Application;
 import com.weaverplatform.service.controllers.StoreController;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
 import com.weaverplatform.service.payloads.JobReport;
+import com.weaverplatform.service.util.Props;
+import com.weaverplatform.service.util.ZipWriter;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.impl.SimpleNamespace;
 import org.eclipse.rdf4j.rio.RDFParser;

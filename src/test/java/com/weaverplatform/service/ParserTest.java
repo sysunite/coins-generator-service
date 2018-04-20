@@ -3,7 +3,7 @@ package com.weaverplatform.service;
 import com.weaverplatform.protocol.WriteOperationParser;
 import com.weaverplatform.protocol.model.CreateNodeOperation;
 import com.weaverplatform.service.util.SortUtil;
-import com.weaverplatform.service.util.towriteops.SortedWriteOperationParser;
+import com.weaverplatform.service.util.tordf.SortedWriteOperationParser;
 import org.junit.Test;
 
 import java.io.IOException;

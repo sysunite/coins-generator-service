@@ -20,12 +20,10 @@ import org.eclipse.rdf4j.rio.turtle.TurtleParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author bastbijl, Sysunite 2018
@@ -115,12 +113,12 @@ public class WriteOperationsExtractor {
 
         if(LOG_WRITE_OPERATIONS) {
           try {
-            File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json");
+            File file = new File("/tmp/" + job.getJobId() + "/bunch_" + total + ".json.gz");
             file.getParentFile().mkdirs();
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(gson.toJson(element.getAsJsonArray()));
-            fileWriter.flush();
-            fileWriter.close();
+            Writer writer = new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(file)), "UTF-8");
+            writer.write(gson.toJson(element.getAsJsonArray()));
+            writer.flush();
+            writer.close();
           } catch (IOException e) {
             e.printStackTrace();
           }

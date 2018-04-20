@@ -4,7 +4,6 @@ import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.service.RDFXMLBasePrettyWriter;
 import com.weaverplatform.service.payloads.AddTriplesRequest;
 import com.weaverplatform.service.util.Props;
-import com.weaverplatform.service.util.towriteops.SortedWriteOperationParser;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.weaverplatform.service.util.towriteops;
+package com.weaverplatform.service.util.tordf;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

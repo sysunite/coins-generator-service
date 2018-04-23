@@ -45,6 +45,7 @@ public class Application {
 
     get("/containerToStore",    StoreController.containerToStore);  // Spins off and returns job
     get("/fileFromStore",       StoreController.fileFromStore);     // Spins off and returns job
+    get("/fileToStore",         StoreController.fileToStore);       // Spins off and returns job
 
     post("/addFile",            ContainerController.addFile);       // Spins off and returns job
 

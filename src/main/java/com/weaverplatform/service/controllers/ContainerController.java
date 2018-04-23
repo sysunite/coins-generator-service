@@ -74,7 +74,7 @@ public class ContainerController {
     // Read the resulting file
     HttpServletResponse raw = response.raw();
     try (OutputStream stream = raw.getOutputStream()) {
-      ZipWriter.streamDownload(zipKey, stream);
+      ZipWriter.streamContainerDownload(zipKey, stream);
     } catch(Exception e) {
       return new JobReport(false, ""+e.getMessage()+"").toString(response);
     }

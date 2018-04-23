@@ -7,7 +7,7 @@ import java.io.InputStream;
 /**
  * @author bastbijl, Sysunite 2018
  */
-public class FileFromStoreRequest implements AddFileRequest {
+public class FileInStoreRequest implements AddFileRequest {
 
   @Expose(serialize = false)
   private InputStream file;

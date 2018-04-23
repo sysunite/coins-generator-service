@@ -3,7 +3,7 @@ package com.weaverplatform.service.controllers;
 
 import com.google.gson.Gson;
 import com.weaverplatform.sdk.Weaver;
-import com.weaverplatform.service.payloads.FileFromStoreRequest;
+import com.weaverplatform.service.payloads.FileInStoreRequest;
 import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.Props;
 import com.weaverplatform.service.util.ZipWriter;
@@ -71,7 +71,7 @@ public class StoreController {
       return new JobReport(false, "Please provide fileId").toString(response);
     }
 
-    FileFromStoreRequest config = new FileFromStoreRequest();
+    FileInStoreRequest config = new FileInStoreRequest();
     config.setPath(path);
     config.setFileId(fileId);
 
@@ -105,6 +105,45 @@ public class StoreController {
     return job.toString(response);
   };
 
+  public static Route fileToStore = (Request request, Response response) -> {
+
+    String project = request.queryParamOrDefault("project", null);
+    if(project == null) {
+      return new JobReport(false, "Please provide project").toString(response);
+    }
+
+    String authToken = request.queryParamOrDefault("user", null);
+    if(authToken == null) {
+      return new JobReport(false, "Please provide authToken").toString(response);
+    }
+
+    String zipKey = request.queryParamOrDefault("zipKey", null);
+    if(zipKey == null) {
+      return new JobReport(false, "Please provide zipKey").toString(response);
+    }
+
+    String path = request.queryParamOrDefault("path", null);
+    if(path == null) {
+      return new JobReport(false, "Please provide path").toString(response);
+    }
+
+    Weaver weaver;
+    try {
+      weaver = getWeaver(project, authToken);
+    } catch(RuntimeException e) {
+      return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
+    }
+
+    logger.info("Starting thread to stream a file to storage from container "+zipKey);
+    JobReport job = JobController.addJob();
+    new Thread() {
+      public void run() {
+        ZipWriter.streamFromZip(zipKey, path, weaver, job);
+      }
+    }.start();
+    return job.toString(response);
+  };
+
   public static Route containerToStore = (Request request, Response response) -> {
 
     String zipKey = request.queryParamOrDefault("zipKey", null);
@@ -133,7 +172,7 @@ public class StoreController {
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {
-        ZipWriter.streamDownload(zipKey, weaver, job);
+        ZipWriter.streamContainerDownload(zipKey, weaver, job);
       }
     }.start();
     return job.toString(response);

@@ -83,7 +83,7 @@ public class ZipWriter {
   }
 
 
-  public static InputStream readFromZip(InputStream input, String path) throws IOException {
+  public static ZipInputStream readFromZip(InputStream input, String path) throws IOException {
     ZipInputStream zipStream = new ZipInputStream(input);
     while(zipStream.available() > 0) {
       ZipEntry entry = zipStream.getNextEntry();
@@ -94,6 +94,23 @@ public class ZipWriter {
       }
     }
     return null;
+  }
+
+  public static void streamFromZip(String zipKey, String path, Weaver weaver, JobReport job) {
+    File file = requestAccess(zipKey);
+    try {
+      File zipPath = new File(path);
+      String fileName = zipPath.getName();
+      ZipInputStream input = readFromZip(new FileInputStream(file), path);
+      ZipWriter.streamDownload(input, fileName, weaver, job);
+    } catch (FileNotFoundException e) {
+      job.setSuccess(false);
+      job.setMessage(e.getMessage());
+    } catch (IOException e) {
+      job.setSuccess(false);
+      job.setMessage(e.getMessage());
+    }
+    freeZipKey(zipKey);
   }
 
   private static synchronized File requestAccess(String zipKey) {
@@ -131,7 +148,7 @@ public class ZipWriter {
     return fs;
   }
 
-  public static void streamDownload(String zipKey, OutputStream stream) {
+  public static void streamContainerDownload(String zipKey, OutputStream stream) {
     File file = requestAccess(zipKey);
     try {
       Files.copy(file.toPath(), stream);
@@ -142,17 +159,21 @@ public class ZipWriter {
     freeZipKey(zipKey);
   }
 
-  public static void streamDownload(String zipKey, Weaver weaver, JobReport job) {
+  public static void streamContainerDownload(String zipKey, Weaver weaver, JobReport job) {
     File file = requestAccess(zipKey);
     try {
       FileInputStream input = new FileInputStream(file);
-      WeaverFile weaverFile = weaver.uploadFile(input, zipKey + ".ccr");
-      job.setFileId(weaverFile.getId());
-      job.setSuccess(true);
+      streamDownload(input, zipKey + ".ccr", weaver, job);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
     freeZipKey(zipKey);
+  }
+
+  public static void streamDownload(InputStream input, String fileName, Weaver weaver, JobReport job) {
+    WeaverFile weaverFile = weaver.uploadFile(input, fileName);
+    job.setFileId(weaverFile.getId());
+    job.setSuccess(true);
   }
 
   public static void wipe(String zipKey) {

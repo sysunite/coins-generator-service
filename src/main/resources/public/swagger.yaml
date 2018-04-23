@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create rdf files inside zip archives.
-  version: 1.6.0
+  version: 1.7.0
   title: rdf-export-service
   contact:
     email: info@sysunite.com
@@ -283,6 +283,38 @@ paths:
           required: true
           type: string
           description: the id of the file in the store
+      responses:
+        '200':
+          description: succes
+
+  /fileToStore:
+    get:
+      description: >-
+        Put a file from the container in the store
+      operationId: fileToStore
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: project
+          required: true
+          type: string
+          description: the id of the project
+        - in: query
+          name: user
+          required: true
+          type: string
+          description: the authtoken of the user calling the service
+        - in: query
+          name: zipKey
+          required: true
+          type: string
+          description: some id of the container
+        - in: query
+          name: path
+          required: true
+          type: string
+          description: the file path in the container where to send the file to
       responses:
         '200':
           description: succes

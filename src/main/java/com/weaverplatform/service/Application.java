@@ -54,6 +54,8 @@ public class Application {
 
     post("/extractRdf",         ExtractTriplesController.extract);  // Spins off and returns job  - progress enabled
 
+    post("/extractRdfFromFile", ExtractTriplesController.extractRdfFromFile);
+
     get("/containerContent",    ContainerController.listContent);
 
     get("/swagger", (request, response) -> {

@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create rdf files inside zip archives.
-  version: 1.5.0
+  version: 1.6.0
   title: rdf-export-service
   contact:
     email: info@sysunite.com
@@ -86,7 +86,7 @@ paths:
   /extractRdf:
     post:
       description: >-
-        Create an rdf file in the container
+        Create write operations based on rdf file in container
       operationId: extractRdf
       parameters:
         - in: query
@@ -109,6 +109,31 @@ paths:
           required: true
           schema:
             type: string
+          description: >-
+            config json (fields are rdfFormat, path, prefixMap, graphMap, defaultGraph, dismissGraphs)
+            supported types for rdfFormat are 'RDF/XML' and 'Turtle'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: succes
+
+  /extractRdfFromFile:
+    post:
+      description: >-
+        Create write operations based on posted rdf file
+      operationId: extractRdfFromFile
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: >-
+            the rdf file content
+        - in: formData
+          name: config
+          type: string
           description: >-
             config json (fields are rdfFormat, path, prefixMap, graphMap, defaultGraph, dismissGraphs)
             supported types for rdfFormat are 'RDF/XML' and 'Turtle'
@@ -310,4 +335,3 @@ paths:
       responses:
         '200':
           description: succes
-

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonWriter;
 import com.weaverplatform.protocol.model.SuperOperation;
 import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.Application;
@@ -37,8 +38,23 @@ public class WriteOperationsExtractor {
 
   public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  public static void writeOperations(ExtractTriplesRequest config, Weaver weaver, JobReport job) {
 
+
+
+  public static WriteOperationsModel loadModel(ExtractTriplesRequest config, Weaver weaver, JobReport job) {
+    InputStream containerFileStream;
+    try {
+      containerFileStream = weaver.downloadFile(config.getFileId());
+      config.setFile(containerFileStream);
+    } catch (IOException e) {
+      job.setSuccess(false);
+      job.setMessage("Failed downloading container file (fileId: "+config.getFileId()+") from local storage.");
+      return null;
+    }
+    return loadModel(config, job);
+  }
+
+  public static WriteOperationsModel loadModel(ExtractTriplesRequest config, JobReport job) {
     job.setScale(100);
 
     RDFParser parser;
@@ -48,16 +64,7 @@ public class WriteOperationsExtractor {
     } else if("rdf/xml".equals(config.getRdfFormat().toLowerCase())) {
       parser = new RDFXMLParser();
     } else {
-      return;
-    }
-
-    InputStream containerFileStream;
-    try {
-      containerFileStream = weaver.downloadFile(config.getFileId());
-    } catch (IOException e) {
-      job.setSuccess(false);
-      job.setMessage("Failed downloading container file (fileId: "+config.getFileId()+") from local storage.");
-      return;
+      return null;
     }
 
     job.setProgress(10);
@@ -76,7 +83,7 @@ public class WriteOperationsExtractor {
 
     InputStream fileStream = null;
     try {
-      fileStream = ZipWriter.readFromZip(containerFileStream, config.getPath());
+      fileStream = ZipWriter.readFromZip(config.getFile(), config.getPath());
     } catch (IOException e) {
     }
     if(fileStream != null) {
@@ -86,16 +93,17 @@ public class WriteOperationsExtractor {
       logger.error(message);
       job.setSuccess(false);
       job.setMessage(message);
-      return;
+      return null;
     }
 
     job.setProgress(20);
 
-    writeTo(model, weaver, job);
+    return model;
   }
 
 
-  private static void writeTo(WriteOperationsModel model, Weaver weaver, JobReport job) {
+
+  public static void writeOperationsToStore(WriteOperationsModel model, Weaver weaver, JobReport job) {
 
     int total = 0;
     job.setScale(model.size());
@@ -134,4 +142,36 @@ public class WriteOperationsExtractor {
       job.setMessage(e.getMessage());
     }
   }
+  public static void writeOperations(WriteOperationsModel model, OutputStream outputStream, JobReport job) {
+
+    JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream));
+
+    int total = 0;
+    job.setScale(model.size());
+    try {
+      writer.beginArray();
+      while (model.hasNext()) {
+
+        List<SuperOperation> items = model.next(WRITE_BATCH_SIZE);
+        if (items.isEmpty()) {
+          continue;
+        }
+        total += items.size();
+        job.setProgress(total);
+        gson.toJson(items, new TypeToken<List<SuperOperation>>() {}.getType(), writer);
+      }
+      job.setScale(total);
+      job.setSuccess(true);
+      logger.info("Inserted " + total + " write operations");
+      writer.endArray();
+      writer.close();
+    } catch (RuntimeException e) {
+      job.setSuccess(false);
+      job.setMessage(e.getMessage());
+    } catch (IOException e) {
+      job.setSuccess(false);
+      job.setMessage(e.getMessage());
+    }
+  }
+
 }

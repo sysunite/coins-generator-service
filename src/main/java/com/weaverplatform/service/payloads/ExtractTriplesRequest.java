@@ -4,8 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import spark.Request;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
+import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -34,6 +39,9 @@ public class ExtractTriplesRequest {
 
   @Expose
   private String fileId;
+
+  @Expose(serialize = false)
+  private InputStream file;
 
 
   public void setPrefixMap(HashMap<String, String> prefixMap) {
@@ -92,8 +100,28 @@ public class ExtractTriplesRequest {
     return fileId;
   }
 
+  public void setFile(InputStream file) {
+    this.file = file;
+  }
+
+  public InputStream getFile() {
+    return file;
+  }
+
   public static ExtractTriplesRequest fromBody(Request request) throws IOException, ServletException {
     ExtractTriplesRequest result  = new Gson().fromJson(request.body(), ExtractTriplesRequest.class);
+    return result;
+  }
+
+  public static ExtractTriplesRequest fromMultipart(Request request) throws IOException, ServletException {
+    MultipartConfigElement multipartConfigElement = new MultipartConfigElement("/tmp/multipart");
+    request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
+    Part file = request.raw().getPart("file");
+    Part config = request.raw().getPart("config");
+
+    Reader reader = new InputStreamReader(config.getInputStream(), "UTF-8");
+    ExtractTriplesRequest result = new Gson().fromJson(reader, ExtractTriplesRequest.class);
+    result.setFile(file.getInputStream());
     return result;
   }
 }

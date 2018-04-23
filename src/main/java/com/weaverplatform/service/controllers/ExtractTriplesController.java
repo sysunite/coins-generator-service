@@ -5,6 +5,7 @@ import com.weaverplatform.sdk.Weaver;
 import com.weaverplatform.service.payloads.ExtractTriplesRequest;
 import com.weaverplatform.service.payloads.JobReport;
 import com.weaverplatform.service.util.towriteops.WriteOperationsExtractor;
+import com.weaverplatform.service.util.towriteops.WriteOperationsModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -53,10 +54,27 @@ public class ExtractTriplesController {
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {
-        WriteOperationsExtractor.writeOperations(config, weaver, job);
+        WriteOperationsModel model = WriteOperationsExtractor.loadModel(config, weaver, job);
+        WriteOperationsExtractor.writeOperationsToStore(model, weaver, job);
       }
     }.start();
     return job.toString(response);
+  };
+
+  public static Route extractRdfFromFile = (Request request, Response response) -> {
+
+    ExtractTriplesRequest config;
+    try {
+      config = ExtractTriplesRequest.fromMultipart(request);
+
+    } catch(Exception e) {
+      return new JobReport(false, "Problem parsing config json in body: "+request.body()).toString(response);
+    }
+    JobReport job = JobController.addJob();
+
+    WriteOperationsModel model = WriteOperationsExtractor.loadModel(config, job);
+    WriteOperationsExtractor.writeOperations(model, response.raw().getOutputStream(), job);
+    return null;
   };
 
 }

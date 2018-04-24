@@ -96,13 +96,12 @@ public class ZipWriter {
     return null;
   }
 
-  public static void streamFromZip(String zipKey, String path, Weaver weaver, JobReport job) {
-    File file = requestAccess(zipKey);
+  public static void streamFromZip(InputStream input, String path, Weaver weaver, JobReport job) {
+
     try {
       File zipPath = new File(path);
       String fileName = zipPath.getName();
-      ZipInputStream input = readFromZip(new FileInputStream(file), path);
-      ZipWriter.streamDownload(input, fileName, weaver, job);
+      ZipWriter.streamDownload(readFromZip(input, path), fileName, weaver, job);
     } catch (FileNotFoundException e) {
       job.setSuccess(false);
       job.setMessage(e.getMessage());
@@ -110,7 +109,7 @@ public class ZipWriter {
       job.setSuccess(false);
       job.setMessage(e.getMessage());
     }
-    freeZipKey(zipKey);
+
   }
 
   private static synchronized File requestAccess(String zipKey) {

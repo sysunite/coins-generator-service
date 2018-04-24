@@ -72,7 +72,7 @@ public class ExtractTriplesController {
     }
     JobReport job = JobController.addJob();
 
-    WriteOperationsModel model = WriteOperationsExtractor.loadModel(config, job);
+    WriteOperationsModel model = WriteOperationsExtractor.loadModel(config, job, false);
     WriteOperationsExtractor.writeOperations(model, response.raw().getOutputStream(), job);
     return null;
   };

@@ -306,10 +306,10 @@ paths:
           type: string
           description: the authtoken of the user calling the service
         - in: query
-          name: zipKey
+          name: fileId
           required: true
           type: string
-          description: some id of the container
+          description: the id of the file in the store
         - in: query
           name: path
           required: true

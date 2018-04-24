@@ -186,6 +186,19 @@ public abstract class RdfModel implements Model {
     return result;
   }
 
+  private void updateNamespaces() {
+    while(!pendingNamespaceSets.isEmpty()) {
+      Set<Namespace> next = pendingNamespaceSets.remove(0);
+      for(Namespace ns : next) {
+        if(ns.getPrefix().isEmpty()) {
+          namespaces.add(new SimpleNamespace(currentPrefix, ns.getName()));
+        } else {
+          namespaces.add(ns);
+        }
+      }
+    }
+  }
+
   public String getGraphForId(String abbreviated) {
     if(abbreviated.indexOf(":") > -1) {
       String prefix = abbreviated.substring(0, abbreviated.indexOf(":"));
@@ -263,16 +276,7 @@ public abstract class RdfModel implements Model {
   @Override
   public final boolean add(Statement statement) {
 
-    while(!pendingNamespaceSets.isEmpty()) {
-      Set<Namespace> next = pendingNamespaceSets.remove(0);
-      for(Namespace ns : next) {
-        if(ns.getPrefix().isEmpty()) {
-          namespaces.add(new SimpleNamespace(currentPrefix, ns.getName()));
-        } else {
-          namespaces.add(ns);
-        }
-      }
-    }
+    updateNamespaces();
 
     for(Filter filter : filters) {
       if(!filter.filter(statement)) {

@@ -14,6 +14,7 @@ import spark.Response;
 import spark.Route;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class StoreController {
 
@@ -117,9 +118,9 @@ public class StoreController {
       return new JobReport(false, "Please provide authToken").toString(response);
     }
 
-    String zipKey = request.queryParamOrDefault("zipKey", null);
-    if(zipKey == null) {
-      return new JobReport(false, "Please provide zipKey").toString(response);
+    String fileId = request.queryParamOrDefault("fileId", null);
+    if(fileId == null) {
+      return new JobReport(false, "Please provide fileId").toString(response);
     }
 
     String path = request.queryParamOrDefault("path", null);
@@ -134,11 +135,20 @@ public class StoreController {
       return new JobReport(false, "Connecting to weaver-server failed with this message: "+e.getMessage().replace("\"", "\\\"")+"").toString(response);
     }
 
-    logger.info("Starting thread to stream a file to storage from container "+zipKey);
+    logger.info("Starting thread to stream a file to storage from container "+fileId);
     JobReport job = JobController.addJob();
     new Thread() {
       public void run() {
-        ZipWriter.streamFromZip(zipKey, path, weaver, job);
+        InputStream containerFileStream;
+        try {
+          containerFileStream = weaver.downloadFile(fileId);
+          ZipWriter.streamFromZip(containerFileStream, path, weaver, job);
+
+          containerFileStream.close();
+        } catch (IOException e) {
+          job.setMessage("Could not read zip file: "+e.getMessage().replace("\"", "\\\"")+"");
+          job.setSuccess(false);
+        }
       }
     }.start();
     return job.toString(response);

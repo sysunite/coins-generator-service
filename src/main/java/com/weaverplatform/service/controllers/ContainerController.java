@@ -140,6 +140,7 @@ public class ContainerController {
         }
       }
 
+      containerFileStream.close();
     } catch (IOException e) {
       return new JobReport(false, "Could not read zip file: "+e.getMessage().replace("\"", "\\\"")+"");
     }

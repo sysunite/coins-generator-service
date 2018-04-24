@@ -55,6 +55,9 @@ public class WriteOperationsExtractor {
   }
 
   public static WriteOperationsModel loadModel(ExtractTriplesRequest config, JobReport job) {
+    return loadModel(config, job, true);
+  }
+  public static WriteOperationsModel loadModel(ExtractTriplesRequest config, JobReport job, boolean fromZip) {
     job.setScale(100);
 
     RDFParser parser;
@@ -72,7 +75,8 @@ public class WriteOperationsExtractor {
     WriteOperationsModel model = new WriteOperationsModel(StoreController.USER);
     Set<Namespace> additionalNamespaces = model.getNamespaces();
     for(String prefix: config.getPrefixMap().keySet()) {
-      additionalNamespaces.add(new SimpleNamespace(prefix, config.getPrefixMap().get(prefix)));
+      String fullUri = config.getPrefixMap().get(prefix);
+      additionalNamespaces.add(new SimpleNamespace(prefix, fullUri));
     }
 
     model.setFilterRestrictions(false);
@@ -83,7 +87,11 @@ public class WriteOperationsExtractor {
 
     InputStream fileStream = null;
     try {
-      fileStream = ZipWriter.readFromZip(config.getFile(), config.getPath());
+      if(fromZip) {
+        fileStream = ZipWriter.readFromZip(config.getFile(), config.getPath());
+      } else {
+        fileStream = config.getFile();
+      }
     } catch (IOException e) {
     }
     if(fileStream != null) {

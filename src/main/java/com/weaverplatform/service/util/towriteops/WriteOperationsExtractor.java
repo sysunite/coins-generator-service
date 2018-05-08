@@ -84,6 +84,7 @@ public class WriteOperationsExtractor {
     model.setGraph(config.getDefaultGraph());
     model.setGraphMap(config.getGraphMap());
     model.setDismissGraphs(config.getDismissGraphs());
+    model.setMapPrefix(config.getMapPrefix());
 
     InputStream fileStream = null;
     try {

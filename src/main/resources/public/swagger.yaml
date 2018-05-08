@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create rdf files inside zip archives.
-  version: 1.7.0
+  version: 1.7.1
   title: rdf-export-service
   contact:
     email: info@sysunite.com
@@ -110,7 +110,7 @@ paths:
           schema:
             type: string
           description: >-
-            config json (fields are rdfFormat, path, prefixMap, graphMap, defaultGraph, dismissGraphs)
+            config json (fields are rdfFormat, path, prefixMap, mapPrefix, graphMap, defaultGraph, dismissGraphs)
             supported types for rdfFormat are 'RDF/XML' and 'Turtle'
       produces:
         - application/json
@@ -135,7 +135,7 @@ paths:
           name: config
           type: string
           description: >-
-            config json (fields are rdfFormat, path, prefixMap, graphMap, defaultGraph, dismissGraphs)
+            config json (fields are rdfFormat, path, prefixMap, mapPrefix, graphMap, defaultGraph, dismissGraphs)
             supported types for rdfFormat are 'RDF/XML' and 'Turtle'
       produces:
         - application/json

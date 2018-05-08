@@ -32,6 +32,8 @@ public abstract class RdfModel implements Model {
   private static final Logger log = LoggerFactory.getLogger(RdfModel.class);
 
 
+  private HashMap<String, String> mapPrefix = new HashMap<>();
+
 
   final static Set<IRI> CLASS_IRIS = new HashSet<>();
   static {
@@ -103,6 +105,19 @@ public abstract class RdfModel implements Model {
     filters.add(filter);
   }
 
+
+  public void setMapPrefix(HashMap<String, String> mapPrefix) {
+    this.mapPrefix = mapPrefix;
+  }
+
+  private String mapPrefix(String prefix) {
+    if(mapPrefix.containsKey(prefix)) {
+      return mapPrefix.get(prefix);
+    }
+    return prefix;
+  }
+
+
   public String abbreviate(IRI resource) {
 
     String namespace = resource.getNamespace();
@@ -111,17 +126,17 @@ public abstract class RdfModel implements Model {
     // Init
     if(prefixMap == null) {
       prefixMap = new HashMap();
-    }
-    for(Namespace ns : namespaces) {
-      if(skippedPrefixes.contains(ns.getPrefix())) {
-        continue;
-      }
-      if(!prefixMap.containsKey(ns.getName())) {
-        prefixMap.put(ns.getName(), ns.getPrefix());
-      } else {
-        if(!ns.getPrefix().equals(prefixMap.get(ns.getName()))) {
-          skippedPrefixes.add(ns.getPrefix());
-          log.warn("Prefix collision for fragment "+ns.getName()+", keeping old: "+prefixMap.get(ns.getName())+" (new: "+ns.getPrefix()+")");
+      for(Namespace ns : namespaces) {
+        if(skippedPrefixes.contains(ns.getPrefix())) {
+          continue;
+        }
+        if(!prefixMap.containsKey(ns.getName())) {
+          prefixMap.put(ns.getName(), ns.getPrefix());
+        } else {
+          if(!ns.getPrefix().equals(prefixMap.get(ns.getName()))) {
+            skippedPrefixes.add(ns.getPrefix());
+            log.warn("Prefix collision for fragment "+ns.getName()+", keeping old: "+prefixMap.get(ns.getName())+" (new: "+ns.getPrefix()+")");
+          }
         }
       }
     }
@@ -129,17 +144,17 @@ public abstract class RdfModel implements Model {
     // Namespace found
     if(prefixMap.containsKey(namespace)) {
       String prefix = prefixMap.get(namespace);
-      return  prefix + ":" + localName;
+      return mapPrefix(prefix) + ":" + localName;
     }
 
     // Full uri found
     if(prefixMap.containsKey(resource.stringValue())) {
       String prefix = prefixMap.get(resource.stringValue());
-      return  prefix + ":";
+      return mapPrefix(prefix) + ":";
     }
     if(prefixMap.containsKey(resource.stringValue()+"#")) {
       String prefix = prefixMap.get(resource.stringValue()+"#");
-      return  prefix + ":";
+      return mapPrefix(prefix) + ":";
     }
 
     // Nothing found

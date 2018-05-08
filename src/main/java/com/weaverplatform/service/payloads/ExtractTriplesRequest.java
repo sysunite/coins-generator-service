@@ -20,6 +20,9 @@ import java.util.HashSet;
 public class ExtractTriplesRequest {
 
   @Expose
+  private HashMap<String, String> mapPrefix;
+
+  @Expose
   private HashMap<String, String> prefixMap;
 
   @Expose
@@ -50,6 +53,14 @@ public class ExtractTriplesRequest {
 
   public HashMap<String, String> getPrefixMap() {
     return prefixMap;
+  }
+
+  public void setMapPrefix(HashMap<String, String> mapPrefix) {
+    this.mapPrefix = mapPrefix;
+  }
+
+  public HashMap<String, String> getMapPrefix() {
+    return mapPrefix;
   }
 
   public void setGraphMap(HashMap<String, String> graphMap) {

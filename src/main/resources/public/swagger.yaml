@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Create rdf files inside zip archives.
-  version: 1.7.1
+  version: 1.7.2
   title: rdf-export-service
   contact:
     email: info@sysunite.com

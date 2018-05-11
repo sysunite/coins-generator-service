@@ -146,13 +146,17 @@ public class WriteOperationsModel extends RdfModel {
 
     while(list.size() < size && !attributeItems.isEmpty()) {
       AttributeItem item = attributeItems.remove(0);
-      if(filterRestriction(item.sourceId) && storeThisGraph(item.sourceId.graphId)) {
+      if(filterRestriction(item.sourceId)) {
+        String graph = defaultGraph;
+        if(storeThisGraph(item.sourceId.graphId)) {
+          graph = item.sourceId.graphId;
+        }
         Object value = getValue(item.literal);
         AttributeDataType dataType = getDataType(item.literal);
         SuperOperation operation = new SuperOperation();
         operation.setAction("create-attribute");
         operation.setId(Cuid.createCuid());
-        operation.setGraph(item.sourceId.graphId);
+        operation.setGraph(graph);
         operation.setUser(user);
         operation.setSourceId(item.sourceId.finalId);
         operation.setSourceGraph(item.sourceId.graphId);
@@ -165,12 +169,16 @@ public class WriteOperationsModel extends RdfModel {
 
     while(list.size() < size && !relationItems.isEmpty()) {
       RelationItem item = relationItems.remove(0);
-      if(filterRestriction(item.sourceId) && filterRestriction(item.toId) && storeThisGraph(item.sourceId.graphId)) {
+      if(filterRestriction(item.sourceId) && filterRestriction(item.toId)) {
+        String graph = defaultGraph;
+        if(storeThisGraph(item.sourceId.graphId)) {
+          graph = item.sourceId.graphId;
+        }
         SuperOperation operation = new SuperOperation();
         operation.setAction("create-relation");
         operation.setUser(user);
         operation.setId(Cuid.createCuid());
-        operation.setGraph(item.sourceId.graphId);
+        operation.setGraph(graph);
         operation.setSourceId(item.sourceId.finalId);
         operation.setSourceGraph(item.sourceId.graphId);
         operation.setKey(item.key.finalId);

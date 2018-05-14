@@ -144,7 +144,11 @@ public abstract class RdfModel implements Model {
     // Namespace found
     if(prefixMap.containsKey(namespace)) {
       String prefix = prefixMap.get(namespace);
-      return mapPrefix(prefix) + ":" + localName;
+      String mapped = mapPrefix(prefix);
+      if(mapped==null || mapped.isEmpty()) {
+        return localName;
+      }
+      return mapped + ":" + localName;
     }
 
     // Full uri found
